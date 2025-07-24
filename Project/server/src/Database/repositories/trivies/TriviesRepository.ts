@@ -1,0 +1,109 @@
+import { Trivia } from "../../../Domain/models/Trivia";
+import { RowDataPacket, ResultSetHeader } from "mysql2";
+import db from "../../connection/DbConnectionPool";
+import { ITriviesRepository } from "../../../Domain/repositories/trivies/ITriviesRepository";
+
+export class TriviesRepository implements ITriviesRepository {
+  async create(trivia: Trivia): Promise<Trivia> {
+    try {
+      const query = `
+        INSERT INTO trivies (pitanje, odgovor, sadrzajId)
+        VALUES (?, ?, ?)
+      `;
+      const [result] = await db.execute<ResultSetHeader>(query, [
+        trivia.pitanje,
+        trivia.odgovor,
+        trivia.sadrzajId
+      ]);
+      if (result.insertId) {
+        return new Trivia(result.insertId, trivia.pitanje, trivia.odgovor, trivia.sadrzajId);
+      }
+      return new Trivia();
+    } catch {
+      return new Trivia();
+    }
+  }
+
+  async getById(id: number): Promise<Trivia> {
+    try {
+      const query = `
+        SELECT id, pitanje, odgovor, sadrzajId
+        FROM trivies
+        WHERE id = ?
+      `;
+      const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
+      if (rows.length > 0) {
+        const row = rows[0];
+        return new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId);
+      }
+      return new Trivia();
+    } catch {
+      return new Trivia();
+    }
+  }
+
+  async getAll(): Promise<Trivia[]> {
+    try {
+      const query = `
+        SELECT id, pitanje, odgovor, sadrzajId
+        FROM trivies
+        ORDER BY id ASC
+      `;
+      const [rows] = await db.execute<RowDataPacket[]>(query);
+      return rows.map(
+        (row) => new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId)
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  async update(trivia: Trivia): Promise<Trivia> {
+    try {
+      const query = `
+        UPDATE trivies
+        SET pitanje = ?, odgovor = ?, sadrzajId = ?
+        WHERE id = ?
+      `;
+      const [result] = await db.execute<ResultSetHeader>(query, [
+        trivia.pitanje,
+        trivia.odgovor,
+        trivia.sadrzajId,
+        trivia.id
+      ]);
+      if (result.affectedRows > 0) {
+        return trivia;
+      }
+      return new Trivia();
+    } catch {
+      return new Trivia();
+    }
+  }
+
+  async delete(id: number): Promise<boolean> {
+    try {
+      const query = `
+        DELETE FROM trivies
+        WHERE id = ?
+      `;
+      const [result] = await db.execute<ResultSetHeader>(query, [id]);
+      return result.affectedRows > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  async exists(id: number): Promise<boolean> {
+    try {
+      const query = `
+        SELECT COUNT(*) as count
+        FROM trivies
+        WHERE id = ?
+      `;
+      const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
+      return rows[0].count > 0;
+    } catch {
+      return false;
+    }
+  }
+}
