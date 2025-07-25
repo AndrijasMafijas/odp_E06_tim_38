@@ -10,7 +10,7 @@ export class UserRepository implements IUserRepository {
         INSERT INTO users (korisnickoIme, lozinka, email) 
         VALUES (?, ?, ?)
       `;
-
+      //console.log("Executing query:", query, "with values:", user.korisnickoIme, user.lozinka, user.email);
       const [result] = await db.execute<ResultSetHeader>(query, [
         user.korisnickoIme,
         user.lozinka,

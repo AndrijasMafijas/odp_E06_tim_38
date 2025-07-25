@@ -19,7 +19,9 @@ export class AuthService implements IAuthService {
     return new UserLoginDto(); // Neispravno korisničko ime ili lozinka
   }
 
-  async registracija(korisnickoIme: string, lozinka: string): Promise<UserLoginDto> {
+  async registracija(korisnickoIme: string, lozinka: string, email: string): Promise<UserLoginDto> {
+    //console.log("AuthService registracija:", korisnickoIme, lozinka, email);
+    
     const existingUser = await this.userRepository.getByUsername(korisnickoIme);
 
     if (existingUser.id !== 0) {
@@ -30,7 +32,7 @@ export class AuthService implements IAuthService {
     const hashedPassword = await bcrypt.hash(lozinka, this.saltRounds);
 
     const newUser = await this.userRepository.create(
-      new User(0, korisnickoIme, hashedPassword)
+      new User(0, korisnickoIme, hashedPassword, email)
     );
 
     if (newUser.id !== 0) {

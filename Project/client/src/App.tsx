@@ -1,27 +1,12 @@
-import { useState, useEffect } from 'react'
-import { PročitajVrednostPoKljuču } from './helpers/local_storage'
-import KontrolnaTabla from './components/kontrolna_tabla/KontrolnaTabla'
-import AutentifikacionaForma from './components/autentifikacija/AutentifikacionaForma'
-import { authApi } from './api_services/auth/AuthAPIService';
+import AppRouter from "./AppRouter";
 
 function App() {
-  const [prijavljen, setPrijavljen] = useState<boolean>(false);
-
-  useEffect(() => {
-    const token = PročitajVrednostPoKljuču('authToken')
-    if (token && token.includes('/')) {
-      setPrijavljen(true)
-    }
-  }, [])
-
-  return prijavljen ? (
-    <KontrolnaTabla onLogout={() => setPrijavljen(false)} />
-  ) : (
-    <AutentifikacionaForma
-      authApi={authApi}
-      onLoginSuccess={() => setPrijavljen(true)}
-    />
-  )
+  return (
+    <>
+      <div className="bg-red-500 text-white p-4">TEST TAILWIND</div>
+      <AppRouter />
+    </>
+  );
 }
 
 export default App;

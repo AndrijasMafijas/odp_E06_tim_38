@@ -1,6 +1,6 @@
 import { RezultatValidacije } from '../../../Domain/types/ValidationResult';
 
-export function validacijaPodatakaAuth(korisnickoIme?: string, lozinka?: string): RezultatValidacije {
+export function validacijaPodatakaAuth(korisnickoIme?: string, lozinka?: string, email?: string): RezultatValidacije {
   if (!korisnickoIme || !lozinka) {
     return { uspesno: false, poruka: 'Korisničko ime i lozinka su obavezni.' };
   }
@@ -15,6 +15,16 @@ export function validacijaPodatakaAuth(korisnickoIme?: string, lozinka?: string)
 
   if (lozinka.length > 20) {
     return { uspesno: false, poruka: 'Lozinka može imati najviše 20 karaktera.' };
+  }
+
+  if (email !== undefined) {
+    if (!email) {
+      return { uspesno: false, poruka: 'Email je obavezan.' };
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return { uspesno: false, poruka: 'Email nije ispravan.' };
+    }
   }
 
   return { uspesno: true };

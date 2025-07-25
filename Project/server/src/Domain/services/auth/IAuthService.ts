@@ -15,5 +15,5 @@ export interface IAuthService {
    * @param lozinka - Lozinka korisnika.
    * @returns Podatke o korisniku ako je registracija uspešna, ili prazan objekat ako nije.
   */
-  registracija(korisnickoIme: string, lozinka: string): Promise<UserLoginDto>;
+  registracija(korisnickoIme: string, lozinka: string, email: string): Promise<UserLoginDto>;
 }

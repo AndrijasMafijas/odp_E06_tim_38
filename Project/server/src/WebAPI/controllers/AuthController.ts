@@ -55,16 +55,18 @@ export class AuthController {
    */
   private async registracija(req: Request, res: Response): Promise<void> {
     try {
-      const { korisnickoIme, lozinka } = req.body;
+      const { korisnickoIme, lozinka, email } = req.body;
 
-      const rezultat = validacijaPodatakaAuth(korisnickoIme, lozinka);
+      //console.log("AuthController registracija:", korisnickoIme, lozinka, email);
+
+      const rezultat = validacijaPodatakaAuth(korisnickoIme, lozinka, email);
 
       if (!rezultat.uspesno) {
         res.status(400).json({ success: false, message: rezultat.poruka });
         return;
       }
 
-      const result = await this.authService.registracija(korisnickoIme, lozinka);
+      const result = await this.authService.registracija(korisnickoIme, lozinka, email);
 
       // Proveravamo da li je registracija uspešna
       if (result.id !== 0) {

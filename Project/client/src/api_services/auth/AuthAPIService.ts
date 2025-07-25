@@ -27,12 +27,14 @@ export const authApi: IAuthAPIService = {
 
   async registracija(
     korisnickoIme: string,
-    lozinka: string
+    lozinka: string,
+    email: string
   ): Promise<AuthResponse> {
     try {
       const res = await axios.post<AuthResponse>(`${API_URL}/register`, {
         korisnickoIme,
         lozinka,
+        email,
       });
       return res.data;
     } catch (error) {

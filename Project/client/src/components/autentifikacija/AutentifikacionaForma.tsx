@@ -9,21 +9,25 @@ export default function AutentifikacionaForma({
 }: AuthFormProps) {
   const [korisnickoIme, setKorisnickoIme] = useState("");
   const [lozinka, setLozinka] = useState("");
+  const [email, setEmail] = useState("");
   const [greska, setGreska] = useState("");
   const [jeRegistracija, setJeRegistracija] = useState(false);
 
   const podnesiFormu = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validacija = validacijaPodatakaAuth(korisnickoIme, lozinka);
+    const validacija = validacijaPodatakaAuth(korisnickoIme, lozinka, jeRegistracija ? email : undefined);
     if (!validacija.uspesno) {
       setGreska(validacija.poruka ?? "Неисправни подаци");
       return;
     }
 
-    const odgovor = jeRegistracija
-      ? await authApi.registracija(korisnickoIme, lozinka)
-      : await authApi.prijava(korisnickoIme, lozinka);
+    let odgovor;
+    if (jeRegistracija) {
+      odgovor = await authApi.registracija(korisnickoIme, lozinka, email);
+    } else {
+      odgovor = await authApi.prijava(korisnickoIme, lozinka);
+    }
 
     if (odgovor.success && odgovor.data) {
       const token = `${odgovor.data.korisnickoIme}/${odgovor.data.id}`;
@@ -33,6 +37,7 @@ export default function AutentifikacionaForma({
       setGreska(odgovor.message);
       setKorisnickoIme("");
       setLozinka("");
+      setEmail("");
     }
   };
 
@@ -67,6 +72,20 @@ export default function AutentifikacionaForma({
             required
           />
         </div>
+
+        {jeRegistracija && (
+          <div className="input-group">
+            <label htmlFor="email">Email:</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Unesite email adresu"
+              required
+            />
+          </div>
+        )}
 
         {greska && <p style={{ color: "red" }}>{greska}</p>}
 
