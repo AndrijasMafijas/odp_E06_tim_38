@@ -44,4 +44,11 @@ export interface ITriviesRepository {
    * @returns Promise koji vraća true ako trivia stavka postoji, false inače
    */
   exists(id: number): Promise<boolean>;
+  /**
+   * Dohvata trivije po sadrzaju i tipu sadrzaja
+   * @param sadrzajId - ID sadržaja
+   * @param tipSadrzaja - tip sadržaja (movie, episode, series)
+   * @returns Promise koji vraća niz trivia stavki
+   */
+  getByContent(sadrzajId: number, tipSadrzaja: string): Promise<Trivia[]>;
 }

@@ -3,6 +3,7 @@ import { IUserService } from "../../Domain/services/users/IUserService";
 import { UserService } from "../../Services/users/UserService";
 import { authMiddleware } from "../middlewere/authMiddleware";
 import { adminMiddleware } from "../middlewere/adminMiddleware";
+import { validacijaPodatakaUser } from "../validators/users/UserValidator";
 
 export class UserController {
   private router: Router;
@@ -35,6 +36,11 @@ export class UserController {
   private async updateUser(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     const userData = req.body;
+    const rezultat = validacijaPodatakaUser(userData);
+    if (!rezultat.uspesno) {
+      res.status(400).json({ success: false, message: rezultat.poruka });
+      return;
+    }
     const user = await this.userService.update({ ...userData, id });
     res.json(user);
   }

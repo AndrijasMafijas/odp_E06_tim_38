@@ -3,6 +3,7 @@ export class Trivia {
     public id: number = 0,
     public pitanje: string = '',
     public odgovor: string = '',
-    public sadrzajId: number = 0
+    public sadrzajId: number = 0,
+    public tipSadrzaja: string = ''
   ) {}
 }

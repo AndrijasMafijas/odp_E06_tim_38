@@ -7,16 +7,17 @@ export class TriviesRepository implements ITriviesRepository {
   async create(trivia: Trivia): Promise<Trivia> {
     try {
       const query = `
-        INSERT INTO trivies (pitanje, odgovor, sadrzajId)
-        VALUES (?, ?, ?)
+        INSERT INTO trivies (pitanje, odgovor, sadrzajId, tipSadrzaja)
+        VALUES (?, ?, ?, ?)
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
         trivia.pitanje,
         trivia.odgovor,
-        trivia.sadrzajId
+        trivia.sadrzajId,
+        trivia.tipSadrzaja
       ]);
       if (result.insertId) {
-        return new Trivia(result.insertId, trivia.pitanje, trivia.odgovor, trivia.sadrzajId);
+        return new Trivia(result.insertId, trivia.pitanje, trivia.odgovor, trivia.sadrzajId, trivia.tipSadrzaja);
       }
       return new Trivia();
     } catch {
@@ -27,14 +28,14 @@ export class TriviesRepository implements ITriviesRepository {
   async getById(id: number): Promise<Trivia> {
     try {
       const query = `
-        SELECT id, pitanje, odgovor, sadrzajId
+        SELECT id, pitanje, odgovor, sadrzajId, tipSadrzaja
         FROM trivies
         WHERE id = ?
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
       if (rows.length > 0) {
         const row = rows[0];
-        return new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId);
+        return new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId, row.tipSadrzaja);
       }
       return new Trivia();
     } catch {
@@ -45,13 +46,13 @@ export class TriviesRepository implements ITriviesRepository {
   async getAll(): Promise<Trivia[]> {
     try {
       const query = `
-        SELECT id, pitanje, odgovor, sadrzajId
+        SELECT id, pitanje, odgovor, sadrzajId, tipSadrzaja
         FROM trivies
         ORDER BY id ASC
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query);
       return rows.map(
-        (row) => new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId)
+        (row) => new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId, row.tipSadrzaja)
       );
     } catch {
       return [];
@@ -62,13 +63,14 @@ export class TriviesRepository implements ITriviesRepository {
     try {
       const query = `
         UPDATE trivies
-        SET pitanje = ?, odgovor = ?, sadrzajId = ?
+        SET pitanje = ?, odgovor = ?, sadrzajId = ?, tipSadrzaja = ?
         WHERE id = ?
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
         trivia.pitanje,
         trivia.odgovor,
         trivia.sadrzajId,
+        trivia.tipSadrzaja,
         trivia.id
       ]);
       if (result.affectedRows > 0) {
@@ -77,6 +79,22 @@ export class TriviesRepository implements ITriviesRepository {
       return new Trivia();
     } catch {
       return new Trivia();
+    }
+  }
+  // Dohvati trivije po sadrzaju i tipu sadrzaja
+  async getByContent(sadrzajId: number, tipSadrzaja: string): Promise<Trivia[]> {
+    try {
+      const query = `
+        SELECT id, pitanje, odgovor, sadrzajId, tipSadrzaja
+        FROM trivies
+        WHERE sadrzajId = ? AND tipSadrzaja = ?
+      `;
+      const [rows] = await db.execute<RowDataPacket[]>(query, [sadrzajId, tipSadrzaja]);
+      return rows.map(
+        (row) => new Trivia(row.id, row.pitanje, row.odgovor, row.sadrzajId, row.tipSadrzaja)
+      );
+    } catch {
+      return [];
     }
   }
 
