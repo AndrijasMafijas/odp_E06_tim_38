@@ -3,7 +3,7 @@ import axios from "axios";
 import GradeInput from "../components/GradeInput";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 
-interface Movie {
+interface Series {
   id: number;
   naziv: string;
   opis: string;
@@ -15,35 +15,35 @@ interface Movie {
 type SortKey = "naziv" | "prosecnaOcena";
 type SortOrder = "asc" | "desc";
 
-export default function KatalogFilmova() {
-  const [filmovi, setFilmovi] = useState<Movie[]>([]);
+export default function KatalogSerija() {
+  const [serije, setSerije] = useState<Series[]>([]);
   const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pretraga, setPretraga] = useState("");
 
-  async function fetchFilmovi() {
+  async function fetchSerije() {
     try {
-      const res = await axios.get("/api/movies");
-      setFilmovi(res.data);
+      const res = await axios.get("/api/series");
+      setSerije(res.data);
     } catch (err) {
-      setGreska("Грешка при учитавању филмова");
+      setGreska("Грешка при учитавању серија");
     } finally {
       setUcitava(false);
     }
   }
 
   useEffect(() => {
-    fetchFilmovi();
+    fetchSerije();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function sortiraniFilmovi() {
-    let filtrirani = filmovi.filter(f =>
-      f.naziv.toLowerCase().includes(pretraga.toLowerCase())
+  function sortiraneSerije() {
+    let filtrirane = serije.filter(s =>
+      s.naziv.toLowerCase().includes(pretraga.toLowerCase())
     );
-    filtrirani = filtrirani.sort((a, b) => {
+    filtrirane = filtrirane.sort((a, b) => {
       let cmp = 0;
       if (sortKey === "naziv") {
         cmp = a.naziv.localeCompare(b.naziv);
@@ -52,7 +52,7 @@ export default function KatalogFilmova() {
       }
       return sortOrder === "asc" ? cmp : -cmp;
     });
-    return filtrirani;
+    return filtrirane;
   }
 
   if (ucitava) return <div>Учитавање...</div>;
@@ -67,7 +67,7 @@ export default function KatalogFilmova() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Каталог филмова</h2>
+      <h2 className="text-2xl font-bold mb-4">Каталог серија</h2>
       <div className="flex flex-wrap gap-4 mb-4 items-end">
         <input
           type="text"
@@ -87,24 +87,24 @@ export default function KatalogFilmova() {
         </select>
       </div>
       <div className="flex flex-wrap gap-4">
-        {sortiraniFilmovi().map((film) => (
+        {sortiraneSerije().map((serija) => (
           <div
-            key={film.id}
+            key={serija.id}
             className="border rounded p-4 w-64 bg-white shadow"
           >
-            {film.coverUrl && (
-              <img src={film.coverUrl} alt={film.naziv} className="mb-2 w-full h-40 object-cover rounded" />
+            {serija.coverUrl && (
+              <img src={serija.coverUrl} alt={serija.naziv} className="mb-2 w-full h-40 object-cover rounded" />
             )}
-            <h3 className="font-semibold text-lg mb-1">{film.naziv}</h3>
-            <p className="text-sm mb-2">{film.opis}</p>
-            <p className="text-xs text-gray-600 mb-1">Жанр: {film.zanr ?? "-"}</p>
-            <p className="font-bold">Просечна оцена: {film.prosecnaOcena?.toFixed(2) ?? "N/A"}</p>
+            <h3 className="font-semibold text-lg mb-1">{serija.naziv}</h3>
+            <p className="text-sm mb-2">{serija.opis}</p>
+            <p className="text-xs text-gray-600 mb-1">Жанр: {serija.zanr ?? "-"}</p>
+            <p className="font-bold">Просечна оцена: {serija.prosecnaOcena?.toFixed(2) ?? "N/A"}</p>
             {korisnik && (
               <GradeInput
                 userId={korisnik.id}
-                contentId={film.id}
-                contentType="movie"
-                onSuccess={fetchFilmovi}
+                contentId={serija.id}
+                contentType="series"
+                onSuccess={fetchSerije}
               />
             )}
           </div>
