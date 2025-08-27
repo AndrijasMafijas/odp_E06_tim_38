@@ -1,106 +1,142 @@
-import { useState } from "react";
-import { SačuvajVrednostPoKljuču } from "../../helpers/local_storage";
+
+import React, { useState } from "react";
 import type { AuthFormProps } from "../../types/props/auth_form_props/AuthFormProps";
 import { validacijaPodatakaAuth } from "../../api_services/validators/auth/AuthValidator";
 
-export default function AutentifikacionaForma({
-  authApi,
-  onLoginSuccess,
-}: AuthFormProps) {
-  const [korisnickoIme, setKorisnickoIme] = useState("");
-  const [lozinka, setLozinka] = useState("");
-  const [email, setEmail] = useState("");
-  const [greska, setGreska] = useState("");
-  const [jeRegistracija, setJeRegistracija] = useState(false);
+const AutentifikacionaForma: React.FC<AuthFormProps> = ({ authApi, onLoginSuccess }) => {
+	const [korisnickoIme, setKorisnickoIme] = useState("");
+	const [lozinka, setLozinka] = useState("");
+	const [email, setEmail] = useState("");
+	const [greska, setGreska] = useState<string | undefined>(undefined);
+	const [uspesno, setUspesno] = useState<string | undefined>(undefined);
+	const [loading, setLoading] = useState(false);
+	const [mode, setMode] = useState<"login" | "register">("login");
 
-  const podnesiFormu = async (e: React.FormEvent) => {
-    e.preventDefault();
+		const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setGreska(undefined);
+		setUspesno(undefined);
+		setLoading(true);
+		const validacija =
+			mode === "login"
+				? validacijaPodatakaAuth(korisnickoIme, lozinka)
+				: validacijaPodatakaAuth(korisnickoIme, lozinka, email);
+		if (!validacija.uspesno) {
+			setGreska(validacija.poruka);
+			setLoading(false);
+			return;
+		}
+		try {
+					if (mode === "login") {
+						const res = await authApi.prijava(korisnickoIme, lozinka);
+						if (res.success) {
+							setUspesno("Uspešna prijava!");
+							setGreska(undefined);
+							onLoginSuccess(res.data); // prosleđuje podatke o korisniku
+						} else {
+							setGreska(res.message);
+						}
+					} else {
+						const res = await authApi.registracija(korisnickoIme, lozinka, email);
+						if (res.success) {
+							setUspesno("Uspešna registracija! Možete se prijaviti.");
+							setGreska(undefined);
+							setMode("login");
+						} else {
+							setGreska(res.message);
+						}
+					}
+		} catch (err) {
+			setGreska("Došlo je do greške. Pokušajte ponovo.");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-    const validacija = validacijaPodatakaAuth(korisnickoIme, lozinka, jeRegistracija ? email : undefined);
-    if (!validacija.uspesno) {
-      setGreska(validacija.poruka ?? "Неисправни подаци");
-      return;
-    }
+	return (
+		<div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
+			<h2 className="text-2xl font-bold mb-4 text-center">
+				{mode === "login" ? "Prijava" : "Registracija"}
+			</h2>
+			<form onSubmit={handleSubmit} className="space-y-4">
+				<div>
+					<label className="block mb-1">Korisničko ime</label>
+					<input
+						type="text"
+						className="w-full border rounded px-3 py-2"
+						value={korisnickoIme}
+						onChange={e => setKorisnickoIme(e.target.value)}
+						autoComplete="username"
+						required
+					/>
+				</div>
+				<div>
+					<label className="block mb-1">Lozinka</label>
+					<input
+						type="password"
+						className="w-full border rounded px-3 py-2"
+						value={lozinka}
+						onChange={e => setLozinka(e.target.value)}
+						autoComplete={mode === "login" ? "current-password" : "new-password"}
+						required
+					/>
+				</div>
+				{mode === "register" && (
+					<div>
+						<label className="block mb-1">Email</label>
+						<input
+							type="email"
+							className="w-full border rounded px-3 py-2"
+							value={email}
+							onChange={e => setEmail(e.target.value)}
+							autoComplete="email"
+							required
+						/>
+					</div>
+				)}
+				{greska && <div className="text-red-600 text-sm">{greska}</div>}
+				{uspesno && <div className="text-green-600 text-sm">{uspesno}</div>}
+				<button
+					type="submit"
+					className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+					disabled={loading}
+				>
+					{loading ? "Obrada..." : mode === "login" ? "Prijavi se" : "Registruj se"}
+				</button>
+			</form>
+			<div className="mt-4 text-center">
+				{mode === "login" ? (
+					<>
+						Nemate nalog?{' '}
+						<button
+							className="text-blue-600 hover:underline"
+							onClick={() => {
+								setMode("register");
+								setGreska(undefined);
+								setUspesno(undefined);
+							}}
+						>
+							Registrujte se
+						</button>
+					</>
+				) : (
+					<>
+						Već imate nalog?{' '}
+						<button
+							className="text-blue-600 hover:underline"
+							onClick={() => {
+								setMode("login");
+								setGreska(undefined);
+								setUspesno(undefined);
+							}}
+						>
+							Prijavite se
+						</button>
+					</>
+				)}
+			</div>
+		</div>
+	);
+};
 
-    let odgovor;
-    if (jeRegistracija) {
-      odgovor = await authApi.registracija(korisnickoIme, lozinka, email);
-    } else {
-      odgovor = await authApi.prijava(korisnickoIme, lozinka);
-    }
-
-    if (odgovor.success && odgovor.data) {
-      const token = `${odgovor.data.korisnickoIme}/${odgovor.data.id}`;
-      SačuvajVrednostPoKljuču("authToken", token);
-      onLoginSuccess();
-    } else {
-      setGreska(odgovor.message);
-      setKorisnickoIme("");
-      setLozinka("");
-      setEmail("");
-    }
-  };
-
-  return (
-    <div className="form-container">
-      <h1>{jeRegistracija ? "Регистрација" : "Пријава"}</h1>
-      <form onSubmit={podnesiFormu}>
-        <div className="input-group">
-          <label htmlFor="username">Корисничко име:</label>
-          <input
-            id="username"
-            type="text"
-            value={korisnickoIme}
-            onChange={(e) => setKorisnickoIme(e.target.value)}
-            placeholder="Унесите корисничко име"
-            minLength={3}
-            maxLength={20}
-            required
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="password">Лозинка:</label>
-          <input
-            id="password"
-            type="password"
-            value={lozinka}
-            onChange={(e) => setLozinka(e.target.value)}
-            placeholder="Унесите лозинку"
-            minLength={6}
-            maxLength={20}
-            required
-          />
-        </div>
-
-        {jeRegistracija && (
-          <div className="input-group">
-            <label htmlFor="email">Email:</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Unesite email adresu"
-              required
-            />
-          </div>
-        )}
-
-        {greska && <p style={{ color: "red" }}>{greska}</p>}
-
-        <button type="submit">
-          {jeRegistracija ? "Регистрација" : "Пријава"}
-        </button>
-      </form>
-      <button
-        onClick={() => setJeRegistracija(!jeRegistracija)}
-        style={{ marginTop: "1rem" }}
-      >
-        {jeRegistracija
-          ? "Имате налог? Пријавите се"
-          : "Немате налог? Региструјте се"}
-      </button>
-    </div>
-  );
-}
+export default AutentifikacionaForma;
