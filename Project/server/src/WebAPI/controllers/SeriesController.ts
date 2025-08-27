@@ -16,22 +16,42 @@ export class SeriesController {
   }
 
   private initializeRoutes(): void {
-    this.router.get("/series", authMiddleware, adminMiddleware, this.getAllSeries.bind(this));
-    this.router.get("/series/:id", authMiddleware, adminMiddleware, this.getSeriesById.bind(this));
+    // Public routes - accessible without auth
+    this.router.get("/series", this.getAllSeries.bind(this));
+    this.router.get("/series/:id", this.getSeriesById.bind(this));
+    
+    // Admin-only routes
     this.router.post("/series", authMiddleware, adminMiddleware, this.createSeries.bind(this));
     this.router.put("/series/:id", authMiddleware, adminMiddleware, this.updateSeries.bind(this));
     this.router.delete("/series/:id", authMiddleware, adminMiddleware, this.deleteSeries.bind(this));
   }
 
   private async getAllSeries(req: Request, res: Response): Promise<void> {
-    const series = await this.seriesService.getAll();
-    res.json(series);
+    try {
+      console.log("GET /series - Pokušavam da učitam serije...");
+      const series = await this.seriesService.getAll();
+      console.log(`Pronađeno serija: ${series.length}`);
+      res.json(series);
+    } catch (error) {
+      console.error("Greška pri učitavanju serija:", error);
+      res.status(500).json({ success: false, message: "Greška pri učitavanju serija" });
+    }
   }
 
   private async getSeriesById(req: Request, res: Response): Promise<void> {
-    const id = Number(req.params.id);
-    const series = await this.seriesService.getById(id);
-    res.json(series);
+    try {
+      const id = Number(req.params.id);
+      console.log(`GET /series/${id} - Pokušavam da učitam seriju...`);
+      const series = await this.seriesService.getById(id);
+      if (!series || !series.id) {
+        res.status(404).json({ success: false, message: "Serija nije pronađena" });
+        return;
+      }
+      res.json(series);
+    } catch (error) {
+      console.error("Greška pri učitavanju serije:", error);
+      res.status(500).json({ success: false, message: "Greška pri učitavanju serije" });
+    }
   }
 
   private async createSeries(req: Request, res: Response): Promise<void> {

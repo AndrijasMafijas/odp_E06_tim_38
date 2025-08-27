@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Series {
   id: number;
   naziv: string;
   opis: string;
   prosecnaOcena: number;
+  brojSezona: number;
   zanr?: string;
+  godinaIzdanja?: number;
   coverUrl?: string;
 }
 
@@ -22,12 +27,14 @@ export default function KatalogSerija() {
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pretraga, setPretraga] = useState("");
+  const navigate = useNavigate();
 
   async function fetchSerije() {
     try {
-      const res = await axios.get("/api/series");
+      const res = await axios.get(`${API_URL}series`);
       setSerije(res.data);
     } catch (err) {
+      console.error("Greška pri učitavanju serija:", err);
       setGreska("Грешка при учитавању серија");
     } finally {
       setUcitava(false);
@@ -36,7 +43,6 @@ export default function KatalogSerija() {
 
   useEffect(() => {
     fetchSerije();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function sortiraneSerije() {
@@ -55,33 +61,47 @@ export default function KatalogSerija() {
     return filtrirane;
   }
 
-  if (ucitava) return <div>Учитавање...</div>;
-  if (greska) return <div style={{ color: "red" }}>{greska}</div>;
+  const handleSerijaClick = (serijaId: number) => {
+    navigate(`/serije/${serijaId}`);
+  };
+
+  if (ucitava) return <div className="p-4 text-center text-gray-600 dark:text-gray-300">Учитавање...</div>;
+  if (greska) return <div className="p-4 text-center text-red-600 dark:text-red-400">{greska}</div>;
 
   // Prijavljeni korisnik iz localStorage
   let korisnik: UserLoginDto | null = null;
   try {
     const korisnikStr = localStorage.getItem("korisnik");
     if (korisnikStr) korisnik = JSON.parse(korisnikStr);
-  } catch {}
+  } catch {
+    // Ignore errors
+  }
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Каталог серија</h2>
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Каталог серија</h2>
       <div className="flex flex-wrap gap-4 mb-4 items-end">
         <input
           type="text"
           placeholder="Претрага по називу..."
-          className="border rounded px-2 py-1"
+          className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={pretraga}
           onChange={e => setPretraga(e.target.value)}
         />
-        <label>Сортирај по:</label>
-        <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)} className="border rounded px-2 py-1">
+        <label className="text-gray-700 dark:text-gray-200">Сортирај по:</label>
+        <select 
+          value={sortKey} 
+          onChange={e => setSortKey(e.target.value as SortKey)} 
+          className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           <option value="naziv">Називу</option>
           <option value="prosecnaOcena">Просечној оцени</option>
         </select>
-        <select value={sortOrder} onChange={e => setSortOrder(e.target.value as SortOrder)} className="border rounded px-2 py-1">
+        <select 
+          value={sortOrder} 
+          onChange={e => setSortOrder(e.target.value as SortOrder)} 
+          className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           <option value="asc">Растуће</option>
           <option value="desc">Опадајуће</option>
         </select>
@@ -90,22 +110,29 @@ export default function KatalogSerija() {
         {sortiraneSerije().map((serija) => (
           <div
             key={serija.id}
-            className="border rounded p-4 w-64 bg-white shadow"
+            className="border border-gray-200 dark:border-gray-700 rounded p-4 w-64 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            onClick={() => handleSerijaClick(serija.id)}
           >
             {serija.coverUrl && (
               <img src={serija.coverUrl} alt={serija.naziv} className="mb-2 w-full h-40 object-cover rounded" />
             )}
-            <h3 className="font-semibold text-lg mb-1">{serija.naziv}</h3>
-            <p className="text-sm mb-2">{serija.opis}</p>
-            <p className="text-xs text-gray-600 mb-1">Жанр: {serija.zanr ?? "-"}</p>
-            <p className="font-bold">Просечна оцена: {serija.prosecnaOcena?.toFixed(2) ?? "N/A"}</p>
+            <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white">{serija.naziv}</h3>
+            <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{serija.opis}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              Жанр: {serija.zanr ?? "-"} | Сезоне: {serija.brojSezona} | Година: {serija.godinaIzdanja}
+            </p>
+            <p className="font-bold text-gray-900 dark:text-white mb-2">
+              Просечна оцена: {serija.prosecnaOcena?.toFixed(2) ?? "N/A"}
+            </p>
             {korisnik && (
-              <GradeInput
-                userId={korisnik.id}
-                contentId={serija.id}
-                contentType="series"
-                onSuccess={fetchSerije}
-              />
+              <div onClick={(e) => e.stopPropagation()}>
+                <GradeInput
+                  userId={korisnik.id}
+                  contentId={serija.id}
+                  contentType="series"
+                  onSuccess={fetchSerije}
+                />
+              </div>
             )}
           </div>
         ))}

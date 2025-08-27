@@ -1,4 +1,6 @@
+ 
 import { Link, useLocation } from "react-router-dom";
+//import { useDarkMode } from "../helpers/useDarkMode";
 
 interface NavigacijaProps {
   prijavljen: boolean;
@@ -7,7 +9,7 @@ interface NavigacijaProps {
 
 export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
   const location = useLocation();
-
+  //const [dark, setDark] = useDarkMode(true);
   const navLinks = [
     { to: "/", label: "Почетна" },
     { to: "/katalog", label: "Каталог филмова" },
@@ -15,10 +17,10 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/60 dark:bg-gray-900/60 shadow-md border-b border-gray-200 dark:border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/60 dark:bg-gray-900/80 shadow-md border-b border-gray-200 dark:border-gray-700 m-0 p-0">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center bg-white/80 dark:bg-gray-900/90 shadow-lg border-l-0 border-r-0 border-t-0 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center space-x-6">
-          <span className="text-3xl font-extrabold text-cyan-600 tracking-tight drop-shadow-sm select-none">
+          <span className="text-3xl font-extrabold text-cyan-600 dark:text-cyan-400 tracking-tight drop-shadow-sm select-none">
             🎬 MovieVerse
           </span>
           <div className="hidden md:flex space-x-3">
@@ -28,7 +30,7 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
                 to={link.to}
                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                   location.pathname === link.to
-                    ? "bg-cyan-600 text-white shadow"
+                    ? "bg-cyan-600 text-white shadow dark:bg-cyan-500 dark:text-gray-900"
                     : "text-gray-700 dark:text-gray-200 hover:bg-cyan-100/70 dark:hover:bg-cyan-800/50 hover:text-cyan-700 dark:hover:text-cyan-300"
                 }`}
               >
@@ -38,7 +40,7 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+  <div className="flex items-center space-x-3">
           {prijavljen ? (
             <button
               onClick={onLogout}

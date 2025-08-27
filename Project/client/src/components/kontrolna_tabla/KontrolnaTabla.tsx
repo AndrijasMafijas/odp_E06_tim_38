@@ -25,7 +25,7 @@ export default function KontrolnaTabla({ onLogout }: KontrolnaTablaProps) {
       <p><strong>ID:</strong> {id}</p>
       <p><strong>Корисничко име:</strong> {korisnickoIme}</p>
       <p><strong>Датум и време:</strong> {new Date().toLocaleString()}</p>
-      <button onClick={handleLogout}>Напусти контролну таблу</button>
+      <button onClick={handleLogout} className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mt-4">Напусти контролну таблу</button>
     </div>
   )
 }

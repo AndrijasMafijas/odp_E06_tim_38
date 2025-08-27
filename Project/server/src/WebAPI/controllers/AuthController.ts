@@ -75,7 +75,7 @@ export class AuthController {
         res.status(401).json({success: false, message: 'Регистрација није успела. Корисничко име већ постоји.', });
       }
     } catch (error) {
-      res.status(500).json({success: false, message: error});
+      res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});
     }
   }
 

@@ -1,11 +1,33 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 :root {
  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -13,11 +35,12 @@
  font-weight: 400;
 }
 
-h1 {
+label {
  font-size: 2.4em;
  line-height: 1.1;
  margin-bottom: 1rem;
  text-align: center;
+ margin-top: 0; /* Eksplicitno uklanjanje gornje margine */
 }
 
 button {
@@ -26,6 +49,9 @@ button {
  padding: 0.6em 1.2em;
  font-size: 1em;
  font-family: inherit;
+}
+
+button.form-button {
  width: 100%;
 }
 
@@ -34,14 +60,15 @@ button {
  padding: 2rem;
 }
 
+
 .input-group {
- margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 label {
- margin-bottom: 0.5rem;
- font-weight: 500;
- text-align: left;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  text-align: left;
 }
 
 input {

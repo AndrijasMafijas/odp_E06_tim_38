@@ -16,16 +16,26 @@ export class MovieController {
   }
 
   private initializeRoutes(): void {
-    this.router.get("/movies", authMiddleware, adminMiddleware, this.getAllMovies.bind(this));
-    this.router.get("/movies/:id", authMiddleware, adminMiddleware, this.getMovieById.bind(this));
+    // Public routes - accessible without auth
+    this.router.get("/movies", this.getAllMovies.bind(this));
+    this.router.get("/movies/:id", this.getMovieById.bind(this));
+    
+    // Admin-only routes
     this.router.post("/movies", authMiddleware, adminMiddleware, this.createMovie.bind(this));
     this.router.put("/movies/:id", authMiddleware, adminMiddleware, this.updateMovie.bind(this));
     this.router.delete("/movies/:id", authMiddleware, adminMiddleware, this.deleteMovie.bind(this));
   }
 
   private async getAllMovies(req: Request, res: Response): Promise<void> {
-    const movies = await this.movieService.getAll();
-    res.json(movies);
+    try {
+      console.log("GET /movies - Pokušavam da učitam filmove...");
+      const movies = await this.movieService.getAll();
+      console.log(`Pronađeno filmova: ${movies.length}`);
+      res.json(movies);
+    } catch (error) {
+      console.error("Greška pri učitavanju filmova:", error);
+      res.status(500).json({ success: false, message: "Greška pri učitavanju filmova" });
+    }
   }
 
   private async getMovieById(req: Request, res: Response): Promise<void> {
