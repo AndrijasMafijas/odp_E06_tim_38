@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
+import AddSeriesForm from "../components/AddSeriesForm";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 import { useNavigate } from "react-router-dom";
 
@@ -27,6 +28,7 @@ export default function KatalogSerija() {
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pretraga, setPretraga] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
 
   async function fetchSerije() {
@@ -79,7 +81,10 @@ export default function KatalogSerija() {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Каталог серија</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Каталог серија</h2>
+      </div>
+      
       <div className="flex flex-wrap gap-4 mb-4 items-end">
         <input
           type="text"
@@ -106,24 +111,49 @@ export default function KatalogSerija() {
           <option value="desc">Опадајуће</option>
         </select>
       </div>
-      <div className="flex flex-wrap gap-4">
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {/* Add Series Card - samo za admin korisnike */}
+        {korisnik && korisnik.uloga === 'admin' && (
+          <div
+            onClick={() => setShowAddForm(true)}
+            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer group flex flex-col items-center justify-center min-h-[400px]"
+          >
+            <div className="text-6xl text-gray-400 dark:text-gray-500 group-hover:text-green-500 transition-colors duration-200 mb-4">
+              +
+            </div>
+            <h3 className="font-semibold text-lg text-gray-600 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-center">
+              Додај нову серију
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 text-center">
+              Кликни да додаш серију
+            </p>
+          </div>
+        )}
+        
+        {/* Series Cards */}
         {sortiraneSerije().map((serija) => (
           <div
             key={serija.id}
-            className="border border-gray-200 dark:border-gray-700 rounded p-4 w-64 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200"
             onClick={() => handleSerijaClick(serija.id)}
           >
             {serija.coverUrl && (
-              <img src={serija.coverUrl} alt={serija.naziv} className="mb-2 w-full h-40 object-cover rounded" />
+              <img src={serija.coverUrl} alt={serija.naziv} className="mb-3 w-full h-48 object-cover rounded-md" />
             )}
-            <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white">{serija.naziv}</h3>
-            <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{serija.opis}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-              Жанр: {serija.zanr ?? "-"} | Сезоне: {serija.brojSezona} | Година: {serija.godinaIzdanja}
-            </p>
-            <p className="font-bold text-gray-900 dark:text-white mb-2">
-              Просечна оцена: {serija.prosecnaOcena?.toFixed(2) ?? "N/A"}
-            </p>
+            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white line-clamp-1">{serija.naziv}</h3>
+            <p className="text-sm mb-3 text-gray-700 dark:text-gray-300 line-clamp-2">{serija.opis}</p>
+            <div className="space-y-1 mb-3">
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium">Жанр:</span> {serija.zanr ?? "-"}
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium">Сезоне:</span> {serija.brojSezona} | <span className="font-medium">Година:</span> {serija.godinaIzdanja}
+              </p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-yellow-500">⭐</span> {serija.prosecnaOcena?.toFixed(1) ?? "N/A"}
+              </p>
+            </div>
             {korisnik && (
               <div onClick={(e) => e.stopPropagation()}>
                 <GradeInput
@@ -137,6 +167,17 @@ export default function KatalogSerija() {
           </div>
         ))}
       </div>
+
+      {/* Add Series Modal */}
+      {showAddForm && (
+        <AddSeriesForm
+          onSuccess={() => {
+            setShowAddForm(false);
+            fetchSerije();
+          }}
+          onCancel={() => setShowAddForm(false)}
+        />
+      )}
     </div>
   );
 }

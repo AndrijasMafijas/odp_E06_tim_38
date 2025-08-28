@@ -120,11 +120,12 @@ export class GradesRepository implements IGradesRepository {
       }
   }
 
-   // Funkcija za ažuriranje prosečne ocene u movies ili episodes
+   // Funkcija za ažuriranje prosečne ocene u movies ili episodes ili series
   private async azurirajProsecnuOcenu(sadrzajId: number, tipSadrzaja: string): Promise<void> {
     let tabela = '';
     if (tipSadrzaja === 'movie') tabela = 'movies';
     else if (tipSadrzaja === 'episode') tabela = 'episodes';
+    else if (tipSadrzaja === 'series') tabela = 'series';
     else return;
     const queryProsek = `SELECT AVG(ocena) as prosecna FROM grades WHERE sadrzajId = ? AND tipSadrzaja = ?`;
     const [rows] = await db.execute<RowDataPacket[]>(queryProsek, [sadrzajId, tipSadrzaja]);

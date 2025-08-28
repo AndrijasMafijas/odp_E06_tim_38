@@ -19,6 +19,7 @@ export class MovieController {
     // Public routes - accessible without auth
     this.router.get("/movies", this.getAllMovies.bind(this));
     this.router.get("/movies/:id", this.getMovieById.bind(this));
+    this.router.post("/movies/public", this.createMoviePublic.bind(this)); // Public create route
     
     // Admin-only routes
     this.router.post("/movies", authMiddleware, adminMiddleware, this.createMovie.bind(this));
@@ -53,6 +54,35 @@ export class MovieController {
     }
     const movie = await this.movieService.create(movieData);
     res.json(movie);
+  }
+
+  private async createMoviePublic(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('Received movie data:', req.body);
+      const movieData = req.body;
+      
+      // Convert string numbers to actual numbers
+      if (movieData.trajanje) movieData.trajanje = parseInt(movieData.trajanje);
+      if (movieData.godinaIzdanja) movieData.godinaIzdanja = parseInt(movieData.godinaIzdanja);
+      if (!movieData.prosecnaOcena) movieData.prosecnaOcena = 0;
+      
+      console.log('Processed movie data:', movieData);
+      const rezultat = validacijaPodatakaMovie(movieData);
+      console.log('Validation result:', rezultat);
+      if (!rezultat.uspesno) {
+        res.status(400).json({ success: false, message: rezultat.poruka });
+        return;
+      }
+      const movie = await this.movieService.create(movieData);
+      if (movie && movie.id !== 0) {
+        res.status(201).json({ success: true, message: "Филм успешно додат", data: movie });
+      } else {
+        res.status(400).json({ success: false, message: "Није могуће додати филм" });
+      }
+    } catch (error) {
+      console.error("Greška pri kreiranju filma:", error);
+      res.status(500).json({ success: false, message: "Грешка на серверу" });
+    }
   }
 
   private async updateMovie(req: Request, res: Response): Promise<void> {

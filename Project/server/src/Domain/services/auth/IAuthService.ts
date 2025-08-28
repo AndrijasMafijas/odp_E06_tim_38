@@ -13,7 +13,17 @@ export interface IAuthService {
    * Registruje novog korisnika sa datim korisničkim imenom i lozinkom.
    * @param korisnickoIme - Korisničko ime korisnika.
    * @param lozinka - Lozinka korisnika.
+   * @param email - Email korisnika.
    * @returns Podatke o korisniku ako je registracija uspešna, ili prazan objekat ako nije.
   */
   registracija(korisnickoIme: string, lozinka: string, email: string): Promise<UserLoginDto>;
+
+  /**
+   * Registruje novog admin korisnika sa datim korisničkim imenom i lozinkom.
+   * @param korisnickoIme - Korisničko ime korisnika.
+   * @param lozinka - Lozinka korisnika.
+   * @param email - Email korisnika.
+   * @returns Podatke o korisniku ako je registracija uspešna, ili prazan objekat ako nije.
+  */
+  registracijaAdmin(korisnickoIme: string, lozinka: string, email: string): Promise<UserLoginDto>;
 }

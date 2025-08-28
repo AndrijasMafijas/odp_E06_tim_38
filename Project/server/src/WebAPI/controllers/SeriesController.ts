@@ -19,6 +19,7 @@ export class SeriesController {
     // Public routes - accessible without auth
     this.router.get("/series", this.getAllSeries.bind(this));
     this.router.get("/series/:id", this.getSeriesById.bind(this));
+    this.router.post("/series/public", this.createSeriesPublic.bind(this)); // Public create route
     
     // Admin-only routes
     this.router.post("/series", authMiddleware, adminMiddleware, this.createSeries.bind(this));
@@ -63,6 +64,35 @@ export class SeriesController {
     }
     const series = await this.seriesService.create(seriesData);
     res.json(series);
+  }
+
+  private async createSeriesPublic(req: Request, res: Response): Promise<void> {
+    try {
+      console.log('Received series data:', req.body);
+      const seriesData = req.body;
+      
+      // Convert string numbers to actual numbers
+      if (seriesData.brojEpizoda) seriesData.brojEpizoda = parseInt(seriesData.brojEpizoda);
+      if (seriesData.godinaIzdanja) seriesData.godinaIzdanja = parseInt(seriesData.godinaIzdanja);
+      if (!seriesData.prosecnaOcena) seriesData.prosecnaOcena = 0;
+      
+      console.log('Processed series data:', seriesData);
+      const rezultat = validacijaPodatakaSeries(seriesData);
+      console.log('Validation result:', rezultat);
+      if (!rezultat.uspesno) {
+        res.status(400).json({ success: false, message: rezultat.poruka });
+        return;
+      }
+      const series = await this.seriesService.create(seriesData);
+      if (series && series.id !== 0) {
+        res.status(201).json({ success: true, message: "Серија успешно додата", data: series });
+      } else {
+        res.status(400).json({ success: false, message: "Није могуће додати серију" });
+      }
+    } catch (error) {
+      console.error("Greška pri kreiranju serije:", error);
+      res.status(500).json({ success: false, message: "Грешка на серверу" });
+    }
   }
 
   private async updateSeries(req: Request, res: Response): Promise<void> {

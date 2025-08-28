@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
+import AddMovieForm from "../components/AddMovieForm";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -24,6 +25,7 @@ export default function KatalogFilmova() {
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pretraga, setPretraga] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
 
   async function fetchFilmovi() {
     try {
@@ -39,7 +41,6 @@ export default function KatalogFilmova() {
 
   useEffect(() => {
     fetchFilmovi();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function sortiraniFilmovi() {
@@ -99,19 +100,44 @@ export default function KatalogFilmova() {
           <option value="desc">Опадајуће</option>
         </select>
       </div>
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {/* Add Movie Card - samo za admin korisnike */}
+        {korisnik && korisnik.uloga === 'admin' && (
+          <div
+            onClick={() => setShowAddForm(true)}
+            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 cursor-pointer group flex flex-col items-center justify-center min-h-[400px]"
+          >
+            <div className="text-6xl text-gray-400 dark:text-gray-500 group-hover:text-green-500 transition-colors duration-200 mb-4">
+              +
+            </div>
+            <h3 className="font-semibold text-lg text-gray-600 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-center">
+              Додај нови филм
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 text-center">
+              Кликни да додаш филм
+            </p>
+          </div>
+        )}
+        
+        {/* Movie Cards */}
         {sortiraniFilmovi().map((film) => (
           <div
             key={film.id}
-            className="border border-gray-200 dark:border-gray-700 rounded p-4 w-64 bg-white dark:bg-gray-800 shadow"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200"
           >
             {film.coverUrl && (
-              <img src={film.coverUrl} alt={film.naziv} className="mb-2 w-full h-40 object-cover rounded" />
+              <img src={film.coverUrl} alt={film.naziv} className="mb-3 w-full h-48 object-cover rounded-md" />
             )}
-            <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white">{film.naziv}</h3>
-            <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">{film.opis}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Жанр: {film.zanr ?? "-"}</p>
-            <p className="font-bold text-gray-900 dark:text-white">Просечна оцена: {film.prosecnaOcena?.toFixed(2) ?? "N/A"}</p>
+            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white line-clamp-1">{film.naziv}</h3>
+            <p className="text-sm mb-3 text-gray-700 dark:text-gray-300 line-clamp-2">{film.opis}</p>
+            <div className="space-y-1 mb-3">
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                <span className="font-medium">Жанр:</span> {film.zanr ?? "-"}
+              </p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-yellow-500">⭐</span> {film.prosecnaOcena?.toFixed(1) ?? "N/A"}
+              </p>
+            </div>
             {korisnik && (
               <GradeInput
                 userId={korisnik.id}
@@ -123,6 +149,17 @@ export default function KatalogFilmova() {
           </div>
         ))}
       </div>
+
+      {/* Add Movie Modal */}
+      {showAddForm && (
+        <AddMovieForm
+          onSuccess={() => {
+            setShowAddForm(false);
+            fetchFilmovi();
+          }}
+          onCancel={() => setShowAddForm(false)}
+        />
+      )}
     </div>
   );
 }

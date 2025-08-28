@@ -1,15 +1,20 @@
 export function validacijaPodatakaGrade(gradeData: any) {
-  if (gradeData.korisnikId === undefined || isNaN(Number(gradeData.korisnikId)) || Number(gradeData.korisnikId) <= 0) {
-    return { uspesno: false, poruka: 'KorisnikId je obavezan i mora biti pozitivan broj.' };
+  // Prihvatamo i client format (userId, contentId, value) i server format (korisnikId, sadrzajId, ocena)
+  const korisnikId = gradeData.userId || gradeData.korisnikId;
+  const sadrzajId = gradeData.contentId || gradeData.sadrzajId;
+  const ocena = gradeData.value || gradeData.ocena;
+  
+  if (korisnikId === undefined || isNaN(Number(korisnikId)) || Number(korisnikId) <= 0) {
+    return { uspesno: false, poruka: 'ID korisnika је обавезан и мора бити позитиван број.' };
   }
-  if (gradeData.sadrzajId === undefined || isNaN(Number(gradeData.sadrzajId)) || Number(gradeData.sadrzajId) <= 0) {
-    return { uspesno: false, poruka: 'SadrzajId je obavezan i mora biti pozitivan broj.' };
+  if (sadrzajId === undefined || isNaN(Number(sadrzajId)) || Number(sadrzajId) <= 0) {
+    return { uspesno: false, poruka: 'ID садржаја је обавезан и мора бити позитиван број.' };
   }
-  if (gradeData.ocena === undefined || isNaN(Number(gradeData.ocena)) || Number(gradeData.ocena) < 0 || Number(gradeData.ocena) > 10) {
-    return { uspesno: false, poruka: 'Ocena mora biti broj između 0 i 10.' };
+  if (ocena === undefined || isNaN(Number(ocena)) || Number(ocena) < 1 || Number(ocena) > 10) {
+    return { uspesno: false, poruka: 'Оцена мора бити број између 1 и 10.' };
   }
   if (gradeData.komentar && typeof gradeData.komentar !== 'string') {
-    return { uspesno: false, poruka: 'Komentar mora biti tekst.' };
+    return { uspesno: false, poruka: 'Коментар мора бити текст.' };
   }
   return { uspesno: true };
 }

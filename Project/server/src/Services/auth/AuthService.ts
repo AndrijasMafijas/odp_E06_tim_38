@@ -13,7 +13,7 @@ export class AuthService implements IAuthService {
     const user = await this.userRepository.getByUsername(korisnickoIme);
 
     if (user.id !== 0 && await bcrypt.compare(lozinka, user.lozinka)) {
-      return new UserLoginDto(user.id, user.korisnickoIme);
+      return new UserLoginDto(user.id, user.korisnickoIme, user.uloga);
     }
 
     return new UserLoginDto(); // Neispravno korisničko ime ili lozinka
@@ -32,11 +32,32 @@ export class AuthService implements IAuthService {
     const hashedPassword = await bcrypt.hash(lozinka, this.saltRounds);
 
     const newUser = await this.userRepository.create(
-      new User(0, korisnickoIme, hashedPassword, email)
+      new User(0, korisnickoIme, hashedPassword, email, 'korisnik')
     );
 
     if (newUser.id !== 0) {
-      return new UserLoginDto(newUser.id, newUser.korisnickoIme);
+      return new UserLoginDto(newUser.id, newUser.korisnickoIme, newUser.uloga);
+    }
+
+    return new UserLoginDto(); // Registracija nije uspela
+  }
+
+  async registracijaAdmin(korisnickoIme: string, lozinka: string, email: string): Promise<UserLoginDto> {
+    const existingUser = await this.userRepository.getByUsername(korisnickoIme);
+
+    if (existingUser.id !== 0) {
+      return new UserLoginDto(); // Korisnik već postoji
+    }
+
+    // Hash-ujemo lozinku pre čuvanja
+    const hashedPassword = await bcrypt.hash(lozinka, this.saltRounds);
+
+    const newUser = await this.userRepository.create(
+      new User(0, korisnickoIme, hashedPassword, email, 'admin')
+    );
+
+    if (newUser.id !== 0) {
+      return new UserLoginDto(newUser.id, newUser.korisnickoIme, newUser.uloga);
     }
 
     return new UserLoginDto(); // Registracija nije uspela

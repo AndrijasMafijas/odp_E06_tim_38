@@ -15,6 +15,7 @@ export class AuthController {
   private initializeRoutes(): void {
     this.router.post('/auth/login', this.prijava.bind(this));
     this.router.post('/auth/register', this.registracija.bind(this));
+    this.router.post('/auth/register/admin', this.registracijaAdmin.bind(this));
   }
 
   /**
@@ -73,6 +74,34 @@ export class AuthController {
         res.status(201).json({success: true, message: 'Uspešna registracija', data: result});
       } else {
         res.status(401).json({success: false, message: 'Регистрација није успела. Корисничко име већ постоји.', });
+      }
+    } catch (error) {
+      res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/register/admin
+   * Registracija novog admin korisnika
+   */
+  private async registracijaAdmin(req: Request, res: Response): Promise<void> {
+    try {
+      const { korisnickoIme, lozinka, email } = req.body;
+
+      const rezultat = validacijaPodatakaAuth(korisnickoIme, lozinka, email);
+
+      if (!rezultat.uspesno) {
+        res.status(400).json({ success: false, message: rezultat.poruka });
+        return;
+      }
+
+      const result = await this.authService.registracijaAdmin(korisnickoIme, lozinka, email);
+
+      // Proveravamo da li je registracija uspešna
+      if (result.id !== 0) {
+        res.status(201).json({success: true, message: 'Uspešna registracija admin korisnika', data: result});
+      } else {
+        res.status(401).json({success: false, message: 'Регистрација админа није успела. Корисничко име већ постоји.', });
       }
     } catch (error) {
       res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});
