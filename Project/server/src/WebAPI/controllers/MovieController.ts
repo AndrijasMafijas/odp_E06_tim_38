@@ -24,6 +24,7 @@ export class MovieController {
     this.router.get("/movies", this.getAllMovies.bind(this));
     this.router.get("/movies/:id", this.getMovieById.bind(this));
     this.router.post("/movies/public", this.createMoviePublic.bind(this)); // Public create route
+    this.router.delete("/movies/public/:id", this.deleteMoviePublic.bind(this)); // Public delete route
     
     // Admin-only routes
     this.router.post("/movies", authMiddleware, adminMiddleware, this.createMovie.bind(this));
@@ -126,6 +127,30 @@ export class MovieController {
     const id = Number(req.params.id);
     const success = await this.movieService.delete(id);
     res.json({ success });
+  }
+
+  /**
+   * DELETE /api/v1/movies/public/:id
+   * Public delete route - brisanje filma
+   */
+  private async deleteMoviePublic(req: Request, res: Response): Promise<void> {
+    try {
+      const id = Number(req.params.id);
+      console.log(`DELETE /movies/public/${id} - Pokušavam da obrišem film...`);
+      
+      const success = await this.movieService.delete(id);
+      
+      if (success) {
+        console.log(`Film ${id} je uspešno obrisan`);
+        res.status(200).json({ success: true, message: "Филм је успешно уклоњен." });
+      } else {
+        console.log(`Neuspešno brisanje filma ${id}`);
+        res.status(404).json({ success: false, message: "Филм није пронађен." });
+      }
+    } catch (error) {
+      console.error("Greška pri brisanju filma:", error);
+      res.status(500).json({ success: false, message: "Грешка при уклањању филма." });
+    }
   }
 
   public getRouter(): Router {

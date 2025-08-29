@@ -16,7 +16,11 @@ export class UserController {
   }
 
   private initializeRoutes(): void {
-    this.router.get("/users", authMiddleware , adminMiddleware, this.getAllUsers.bind(this));
+    // Public routes
+    this.router.get("/users", this.getAllUsersPublic.bind(this)); // Public get all users
+    this.router.put("/users/public/:id/role", this.updateUserRolePublic.bind(this)); // Public role update
+    
+    // Admin routes
     this.router.get("/users/:id", authMiddleware , adminMiddleware, this.getUserById.bind(this));
     this.router.put("/users/:id",authMiddleware, adminMiddleware, this.updateUser.bind(this));
     this.router.delete("/users/:id", authMiddleware , adminMiddleware, this.deleteUser.bind(this));
@@ -49,6 +53,56 @@ export class UserController {
     const id = Number(req.params.id);
     const success = await this.userService.delete(id);
     res.json({ success });
+  }
+
+  /**
+   * GET /api/v1/users
+   * Public route - get all users
+   */
+  private async getAllUsersPublic(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("GET /users - Pokušavam da učitam sve korisnike...");
+      const users = await this.userService.getAll();
+      console.log(`Pronađeno korisnika: ${users.length}`);
+      res.status(200).json(users);
+    } catch (error) {
+      console.error("Greška pri učitavanju korisnika:", error);
+      res.status(500).json({ success: false, message: "Greška pri učitavanju korisnika" });
+    }
+  }
+
+  /**
+   * PUT /api/v1/users/public/:id/role
+   * Public route - update user role
+   */
+  private async updateUserRolePublic(req: Request, res: Response): Promise<void> {
+    try {
+      const id = Number(req.params.id);
+      const { uloga } = req.body;
+      
+      console.log(`PUT /users/public/${id}/role - Ažuriram ulogu na: ${uloga}`);
+      
+      if (!uloga || !['korisnik', 'admin'].includes(uloga)) {
+        res.status(400).json({ success: false, message: "Neispravna uloga. Mora biti 'korisnik' ili 'admin'." });
+        return;
+      }
+      
+      const success = await this.userService.updateRole(id, uloga);
+      
+      if (success) {
+        console.log(`Uloga korisnika ${id} je ažurirana na: ${uloga}`);
+        res.status(200).json({ 
+          success: true, 
+          message: `Корисник је успешно ${uloga === 'admin' ? 'унапређен у администратора' : 'враћен на корисника'}.` 
+        });
+      } else {
+        console.log(`Neuspešno ažuriranje uloge za korisnika ${id}`);
+        res.status(404).json({ success: false, message: "Корисник није пронађен." });
+      }
+    } catch (error) {
+      console.error("Greška pri ažuriranju uloge:", error);
+      res.status(500).json({ success: false, message: "Грешка при ажурирању улоге корисника." });
+    }
   }
 
   public getRouter(): Router {

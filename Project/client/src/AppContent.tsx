@@ -56,7 +56,7 @@ export default function AppContent() {
         <Route path="/profil" element={prijavljen ? <MojProfil onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/login" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={handleLoginSuccess} />} />
         <Route path="/signup" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={handleLoginSuccess} />} />
-        <Route path="/dashboard" element={prijavljen ? <KontrolnaTabla onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={prijavljen ? <KontrolnaTabla /> : <Navigate to="/login" />} />
       </Routes>
     </div>
   );

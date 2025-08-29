@@ -15,6 +15,18 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   //const [dark, setDark] = useDarkMode(true);
   
+  // Učitaj trenutnog korisnika iz localStorage-a
+  const getCurrentUser = () => {
+    try {
+      const korisnikStr = localStorage.getItem("korisnik");
+      return korisnikStr ? JSON.parse(korisnikStr) : null;
+    } catch {
+      return null;
+    }
+  };
+  
+  const currentUser = getCurrentUser();
+  
   // Zatvori dropdown kada se klikne van njega
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -77,7 +89,9 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                   <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">Добродошли</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Корисник</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {currentUser && currentUser.uloga === 'admin' ? 'Админ' : 'Корисник'}
+                    </p>
                   </div>
                   
                   <Link
@@ -88,13 +102,16 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
                     👤 Мој профил
                   </Link>
                   
-                  <Link
-                    to="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    📊 Контролна табла
-                  </Link>
+                  {/* Контролна табла - само за админе */}
+                  {currentUser && currentUser.uloga === 'admin' && (
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      📊 Контролна табла
+                    </Link>
+                  )}
                   
                   <button
                     onClick={() => {

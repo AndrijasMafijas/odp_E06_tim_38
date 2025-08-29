@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import { triviaApi } from "../api_services/TriviaAPIService";
+import { seriesApi } from "../api_services/SeriesAPIService";
 import type { TriviaDto } from "../models/TriviaDto";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
 import AddSeriesForm from "../components/AddSeriesForm";
+import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 import { useNavigate } from "react-router-dom";
 
@@ -32,6 +35,8 @@ export default function KatalogSerija() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pretraga, setPretraga] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [seriesToDelete, setSeriesToDelete] = useState<Series | null>(null);
   const navigate = useNavigate();
 
   async function fetchSerije() {
@@ -67,6 +72,30 @@ export default function KatalogSerija() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serije]);
+
+  const handleDeleteSeries = async (series: Series) => {
+    try {
+      const result = await seriesApi.deleteSeries(series.id);
+      if (result.success) {
+        setSerije(prev => prev.filter(s => s.id !== series.id));
+        setTrivije(prev => {
+          const { [series.id]: deleted, ...rest } = prev;
+          return rest;
+        });
+        alert(result.message);
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Greška pri brisanju serije:", error);
+      alert("Грешка при уклањању серије.");
+    }
+  };
+
+  const openDeleteModal = (series: Series) => {
+    setSeriesToDelete(series);
+    setShowDeleteModal(true);
+  };
 
   function sortiraneSerije() {
     let filtrirane = serije.filter(s =>
@@ -185,14 +214,24 @@ export default function KatalogSerija() {
                   <span className="text-yellow-500 text-lg">⭐</span>
                   <span className="text-base font-semibold text-gray-900 dark:text-white">{serija.prosecnaOcena?.toFixed(1) ?? "N/A"}</span>
                 </div>
-                {korisnik && (
-                  <GradeInput
-                    userId={korisnik.id}
-                    contentId={serija.id}
-                    contentType="series"
-                    onSuccess={fetchSerije}
-                  />
-                )}
+                <div className="space-y-2 w-full">
+                  {korisnik && (
+                    <GradeInput
+                      userId={korisnik.id}
+                      contentId={serija.id}
+                      contentType="series"
+                      onSuccess={fetchSerije}
+                    />
+                  )}
+                  {korisnik && korisnik.uloga === 'admin' && (
+                    <button
+                      onClick={() => openDeleteModal(serija)}
+                      className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-1"
+                    >
+                      🗑️ Уклони серију
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -209,6 +248,15 @@ export default function KatalogSerija() {
           onCancel={() => setShowAddForm(false)}
         />
       )}
+
+      {/* Delete Series Modal */}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => seriesToDelete && handleDeleteSeries(seriesToDelete)}
+        itemName={seriesToDelete?.naziv || ""}
+        itemType="serija"
+      />
     </div>
   );
 }

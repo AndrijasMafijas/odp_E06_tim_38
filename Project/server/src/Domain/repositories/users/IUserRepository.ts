@@ -52,4 +52,12 @@ export interface IUserRepository {
    * @returns Promise koji vraća true ako korisnik postoji, false inače
    */
   exists(id: number): Promise<boolean>;
+
+  /**
+   * Ažurira ulogu korisnika
+   * @param id - ID korisnika
+   * @param uloga - Nova uloga korisnika ('korisnik' ili 'admin')
+   * @returns Promise koji vraća true ako je ažuriranje uspešno, false inače
+   */
+  updateRole(id: number, uloga: string): Promise<boolean>;
 }

@@ -7,4 +7,5 @@ export interface IUserService {
     getAll(): Promise<User[]>;
     update(user: User): Promise<User>;
     delete(id: number): Promise<boolean>;
+    updateRole(id: number, uloga: string): Promise<boolean>;
 }

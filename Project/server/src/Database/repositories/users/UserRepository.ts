@@ -146,4 +146,20 @@ export class UserRepository implements IUserRepository {
       return false;
     }
   }
+
+  async updateRole(id: number, uloga: string): Promise<boolean> {
+    try {
+      const query = `
+        UPDATE users 
+        SET uloga = ?
+        WHERE id = ?
+      `;
+      
+      const [result] = await db.execute<ResultSetHeader>(query, [uloga, id]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error("Greška pri ažuriranju uloge:", error);
+      return false;
+    }
+  }
 }

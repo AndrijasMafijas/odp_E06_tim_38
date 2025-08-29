@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import { triviaApi } from "../api_services/TriviaAPIService";
+import { movieApi } from "../api_services/MovieAPIService";
 import type { TriviaDto } from "../models/TriviaDto";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
 import AddMovieForm from "../components/AddMovieForm";
+import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -29,6 +32,12 @@ export default function KatalogFilmova() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [pretraga, setPretraga] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [movieToDelete, setMovieToDelete] = useState<Movie | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserLoginDto | null>(() => {
+    const userData = localStorage.getItem("korisnik");
+    return userData ? JSON.parse(userData) : null;
+  });
 
   async function fetchFilmovi() {
     try {
@@ -63,6 +72,30 @@ export default function KatalogFilmova() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filmovi]);
+
+  const handleDeleteMovie = async (movie: Movie) => {
+    try {
+      const result = await movieApi.deleteMovie(movie.id);
+      if (result.success) {
+        setFilmovi(prev => prev.filter(f => f.id !== movie.id));
+        setTrivije(prev => {
+          const { [movie.id]: deleted, ...rest } = prev;
+          return rest;
+        });
+        alert(result.message);
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Greška pri brisanju filma:", error);
+      alert("Грешка при уклањању филма.");
+    }
+  };
+
+  const openDeleteModal = (movie: Movie) => {
+    setMovieToDelete(movie);
+    setShowDeleteModal(true);
+  };
 
   function sortiraniFilmovi() {
     let filtrirani = filmovi.filter(f =>
@@ -169,14 +202,24 @@ export default function KatalogFilmova() {
                   <span className="text-yellow-500 text-lg">⭐</span>
                   <span className="text-base font-semibold text-gray-900 dark:text-white">{film.prosecnaOcena?.toFixed(1) ?? "N/A"}</span>
                 </div>
-                {korisnik && (
-                  <GradeInput
-                    userId={korisnik.id}
-                    contentId={film.id}
-                    contentType="movie"
-                    onSuccess={fetchFilmovi}
-                  />
-                )}
+                <div className="space-y-2">
+                  {korisnik && (
+                    <GradeInput
+                      userId={korisnik.id}
+                      contentId={film.id}
+                      contentType="movie"
+                      onSuccess={fetchFilmovi}
+                    />
+                  )}
+                  {korisnik && korisnik.uloga === 'admin' && (
+                    <button
+                      onClick={() => openDeleteModal(film)}
+                      className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-1"
+                    >
+                      🗑️ Уклони филм
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -193,6 +236,15 @@ export default function KatalogFilmova() {
           onCancel={() => setShowAddForm(false)}
         />
       )}
+
+      {/* Delete Movie Modal */}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => movieToDelete && handleDeleteMovie(movieToDelete)}
+        itemName={movieToDelete?.naziv || ""}
+        itemType="film"
+      />
     </div>
   );
 }

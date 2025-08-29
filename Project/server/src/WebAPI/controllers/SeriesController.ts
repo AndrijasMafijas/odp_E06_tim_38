@@ -24,6 +24,7 @@ export class SeriesController {
     this.router.get("/series", this.getAllSeries.bind(this));
     this.router.get("/series/:id", this.getSeriesById.bind(this));
     this.router.post("/series/public", this.createSeriesPublic.bind(this)); // Public create route
+    this.router.delete("/series/public/:id", this.deleteSeriesPublic.bind(this)); // Public delete route
     
     // Admin-only routes
     this.router.post("/series", authMiddleware, adminMiddleware, this.createSeries.bind(this));
@@ -136,6 +137,30 @@ export class SeriesController {
     const id = Number(req.params.id);
     const success = await this.seriesService.delete(id);
     res.json({ success });
+  }
+
+  /**
+   * DELETE /api/v1/series/public/:id
+   * Public delete route - brisanje serije
+   */
+  private async deleteSeriesPublic(req: Request, res: Response): Promise<void> {
+    try {
+      const id = Number(req.params.id);
+      console.log(`DELETE /series/public/${id} - Pokušavam da obrišem seriju...`);
+      
+      const success = await this.seriesService.delete(id);
+      
+      if (success) {
+        console.log(`Serija ${id} je uspešno obrisana`);
+        res.status(200).json({ success: true, message: "Серија је успешно уклоњена." });
+      } else {
+        console.log(`Neuspešno brisanje serije ${id}`);
+        res.status(404).json({ success: false, message: "Серија није пронађена." });
+      }
+    } catch (error) {
+      console.error("Greška pri brisanju serije:", error);
+      res.status(500).json({ success: false, message: "Грешка при уклањању серије." });
+    }
   }
 
   public getRouter(): Router {
