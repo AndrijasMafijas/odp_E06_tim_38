@@ -12,7 +12,9 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
     opis: '',
     brojEpizoda: 1,
     zanr: '',
-    godinaIzdanja: new Date().getFullYear()
+    godinaIzdanja: new Date().getFullYear(),
+    triviaPitanje: '',
+    triviaOdgovor: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -118,6 +120,34 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
               name="zanr"
               value={formData.zanr}
               onChange={handleChange}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Триvia питање *
+            </label>
+            <textarea
+              name="triviaPitanje"
+              value={formData.triviaPitanje}
+              onChange={handleChange}
+              required
+              rows={2}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Триvia одговор *
+            </label>
+            <input
+              type="text"
+              name="triviaOdgovor"
+              value={formData.triviaOdgovor}
+              onChange={handleChange}
+              required
               className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

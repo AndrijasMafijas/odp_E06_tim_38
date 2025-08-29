@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express";
 import { IMoviesService } from "../../Domain/services/movies/IMoviesService";
 import { MovieService } from "../../Services/movies/MovieService";
+import { ITriviesService } from "../../Domain/services/trivies/ITriviesService";
+import { TrivieService } from "../../Services/trivies/TrivieService";
 import { authMiddleware } from "../middlewere/authMiddleware";
 import { adminMiddleware } from "../middlewere/adminMiddleware";
 import { validacijaPodatakaMovie } from "../validators/movies/MovieValidator";
@@ -8,10 +10,12 @@ import { validacijaPodatakaMovie } from "../validators/movies/MovieValidator";
 export class MovieController {
   private router: Router;
   private movieService: IMoviesService;
+  private triviaService: ITriviesService;
 
-  constructor(movieService: IMoviesService = new MovieService()) {
+  constructor(movieService: IMoviesService = new MovieService(), triviaService: ITriviesService = new TrivieService()) {
     this.router = Router();
     this.movieService = movieService;
+    this.triviaService = triviaService;
     this.initializeRoutes();
   }
 
@@ -61,21 +65,42 @@ export class MovieController {
       console.log('Received movie data:', req.body);
       const movieData = req.body;
       
-      // Convert string numbers to actual numbers
-      if (movieData.trajanje) movieData.trajanje = parseInt(movieData.trajanje);
-      if (movieData.godinaIzdanja) movieData.godinaIzdanja = parseInt(movieData.godinaIzdanja);
-      if (!movieData.prosecnaOcena) movieData.prosecnaOcena = 0;
+      // Extract trivia data
+      const { triviaPitanje, triviaOdgovor, ...movieOnlyData } = movieData;
       
-      console.log('Processed movie data:', movieData);
-      const rezultat = validacijaPodatakaMovie(movieData);
+      // Convert string numbers to actual numbers
+      if (movieOnlyData.trajanje) movieOnlyData.trajanje = parseInt(movieOnlyData.trajanje);
+      if (movieOnlyData.godinaIzdanja) movieOnlyData.godinaIzdanja = parseInt(movieOnlyData.godinaIzdanja);
+      if (!movieOnlyData.prosecnaOcena) movieOnlyData.prosecnaOcena = 0;
+      
+      console.log('Processed movie data:', movieOnlyData);
+      const rezultat = validacijaPodatakaMovie(movieOnlyData);
       console.log('Validation result:', rezultat);
       if (!rezultat.uspesno) {
         res.status(400).json({ success: false, message: rezultat.poruka });
         return;
       }
-      const movie = await this.movieService.create(movieData);
+
+      // Validate trivia data
+      if (!triviaPitanje || !triviaOdgovor) {
+        res.status(400).json({ success: false, message: "Триvia питање и одговор су обавезни" });
+        return;
+      }
+      
+      const movie = await this.movieService.create(movieOnlyData);
       if (movie && movie.id !== 0) {
-        res.status(201).json({ success: true, message: "Филм успешно додат", data: movie });
+        // Create trivia for the movie
+        const triviaData = {
+          id: 0,
+          pitanje: triviaPitanje,
+          odgovor: triviaOdgovor,
+          sadrzajId: movie.id,
+          tipSadrzaja: 'movie'
+        };
+        
+        await this.triviaService.create(triviaData);
+        
+        res.status(201).json({ success: true, message: "Филм и триvia успешно додати", data: movie });
       } else {
         res.status(400).json({ success: false, message: "Није могуће додати филм" });
       }

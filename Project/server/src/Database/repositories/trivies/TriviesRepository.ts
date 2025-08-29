@@ -7,7 +7,7 @@ export class TriviesRepository implements ITriviesRepository {
   async create(trivia: Trivia): Promise<Trivia> {
     try {
       const query = `
-        INSERT INTO trivies (pitanje, odgovor, sadrzajId, tipSadrzaja)
+        INSERT INTO trivias (pitanje, odgovor, sadrzajId, tipSadrzaja)
         VALUES (?, ?, ?, ?)
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
@@ -29,7 +29,7 @@ export class TriviesRepository implements ITriviesRepository {
     try {
       const query = `
         SELECT id, pitanje, odgovor, sadrzajId, tipSadrzaja
-        FROM trivies
+        FROM trivias
         WHERE id = ?
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
@@ -47,7 +47,7 @@ export class TriviesRepository implements ITriviesRepository {
     try {
       const query = `
         SELECT id, pitanje, odgovor, sadrzajId, tipSadrzaja
-        FROM trivies
+        FROM trivias
         ORDER BY id ASC
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query);
@@ -62,7 +62,7 @@ export class TriviesRepository implements ITriviesRepository {
   async update(trivia: Trivia): Promise<Trivia> {
     try {
       const query = `
-        UPDATE trivies
+        UPDATE trivias
         SET pitanje = ?, odgovor = ?, sadrzajId = ?, tipSadrzaja = ?
         WHERE id = ?
       `;
@@ -86,7 +86,7 @@ export class TriviesRepository implements ITriviesRepository {
     try {
       const query = `
         SELECT id, pitanje, odgovor, sadrzajId, tipSadrzaja
-        FROM trivies
+        FROM trivias
         WHERE sadrzajId = ? AND tipSadrzaja = ?
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query, [sadrzajId, tipSadrzaja]);
@@ -101,7 +101,7 @@ export class TriviesRepository implements ITriviesRepository {
   async delete(id: number): Promise<boolean> {
     try {
       const query = `
-        DELETE FROM trivies
+        DELETE FROM trivias
         WHERE id = ?
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [id]);
@@ -115,7 +115,7 @@ export class TriviesRepository implements ITriviesRepository {
     try {
       const query = `
         SELECT COUNT(*) as count
-        FROM trivies
+        FROM trivias
         WHERE id = ?
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);

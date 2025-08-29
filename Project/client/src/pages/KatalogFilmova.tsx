@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { triviaApi } from "../api_services/TriviaAPIService";
+import type { TriviaDto } from "../models/TriviaDto";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
 import AddMovieForm from "../components/AddMovieForm";
@@ -20,6 +22,7 @@ type SortOrder = "asc" | "desc";
 
 export default function KatalogFilmova() {
   const [filmovi, setFilmovi] = useState<Movie[]>([]);
+  const [trivije, setTrivije] = useState<Record<number, TriviaDto[]>>({});
   const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
@@ -42,6 +45,24 @@ export default function KatalogFilmova() {
   useEffect(() => {
     fetchFilmovi();
   }, []);
+
+  useEffect(() => {
+    // Kada se filmovi učitaju, povuci trivije za svaki film
+    if (filmovi.length > 0) {
+      filmovi.forEach(async (film) => {
+        if (!trivije[film.id]) {
+          try {
+            const data = await triviaApi.getByContent(film.id, "movie");
+            setTrivije(prev => ({ ...prev, [film.id]: data }));
+          } catch (error) {
+            // Ignore trivia loading errors
+            console.warn(`Failed to load trivia for movie ${film.id}:`, error);
+          }
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filmovi]);
 
   function sortiraniFilmovi() {
     let filtrirani = filmovi.filter(f =>
@@ -123,7 +144,7 @@ export default function KatalogFilmova() {
         {sortiraniFilmovi().map((film) => (
           <div
             key={film.id}
-            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between"
           >
             {film.coverUrl && (
               <img src={film.coverUrl} alt={film.naziv} className="mb-3 w-full h-48 object-cover rounded-md" />
@@ -134,18 +155,30 @@ export default function KatalogFilmova() {
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 <span className="font-medium">Жанр:</span> {film.zanr ?? "-"}
               </p>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                <span className="text-yellow-500">⭐</span> {film.prosecnaOcena?.toFixed(1) ?? "N/A"}
-              </p>
+              {trivije[film.id] && trivije[film.id][0] && (
+                <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivije[film.id][0].pitanje}>
+                  <span className="font-medium">Trivia:</span> {trivije[film.id][0].pitanje}
+                </p>
+              )}
             </div>
-            {korisnik && (
-              <GradeInput
-                userId={korisnik.id}
-                contentId={film.id}
-                contentType="movie"
-                onSuccess={fetchFilmovi}
-              />
-            )}
+            {/* Ocena i dugme u posebnom boxu */}
+            <div className="mt-auto">
+              <div className="rounded-md bg-gray-100 dark:bg-gray-700 p-2 flex flex-col items-center">
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-sm text-gray-700 dark:text-gray-300 mr-1">Prosečna ocena:</span>
+                  <span className="text-yellow-500 text-lg">⭐</span>
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">{film.prosecnaOcena?.toFixed(1) ?? "N/A"}</span>
+                </div>
+                {korisnik && (
+                  <GradeInput
+                    userId={korisnik.id}
+                    contentId={film.id}
+                    contentType="movie"
+                    onSuccess={fetchFilmovi}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { triviaApi } from "../api_services/TriviaAPIService";
+import type { TriviaDto } from "../models/TriviaDto";
 import axios from "axios";
 import GradeInput from "../components/GradeInput";
 import AddSeriesForm from "../components/AddSeriesForm";
@@ -23,6 +25,7 @@ type SortOrder = "asc" | "desc";
 
 export default function KatalogSerija() {
   const [serije, setSerije] = useState<Series[]>([]);
+  const [trivije, setTrivije] = useState<Record<number, TriviaDto[]>>({});
   const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
@@ -46,6 +49,24 @@ export default function KatalogSerija() {
   useEffect(() => {
     fetchSerije();
   }, []);
+
+  useEffect(() => {
+    // Kada se serije učitaju, povuci trivije za svaku seriju
+    if (serije.length > 0) {
+      serije.forEach(async (serija) => {
+        if (!trivije[serija.id]) {
+          try {
+            const data = await triviaApi.getByContent(serija.id, "series");
+            setTrivije(prev => ({ ...prev, [serija.id]: data }));
+          } catch (error) {
+            // Ignore trivia loading errors
+            console.warn(`Failed to load trivia for series ${serija.id}:`, error);
+          }
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serije]);
 
   function sortiraneSerije() {
     let filtrirane = serije.filter(s =>
@@ -135,7 +156,7 @@ export default function KatalogSerija() {
         {sortiraneSerije().map((serija) => (
           <div
             key={serija.id}
-            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between"
             onClick={() => handleSerijaClick(serija.id)}
           >
             {serija.coverUrl && (
@@ -150,20 +171,30 @@ export default function KatalogSerija() {
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 <span className="font-medium">Сезоне:</span> {serija.brojSezona} | <span className="font-medium">Година:</span> {serija.godinaIzdanja}
               </p>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                <span className="text-yellow-500">⭐</span> {serija.prosecnaOcena?.toFixed(1) ?? "N/A"}
-              </p>
+              {trivije[serija.id] && trivije[serija.id][0] && (
+                <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivije[serija.id][0].pitanje}>
+                  <span className="font-medium">Trivia:</span> {trivije[serija.id][0].pitanje}
+                </p>
+              )}
             </div>
-            {korisnik && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <GradeInput
-                  userId={korisnik.id}
-                  contentId={serija.id}
-                  contentType="series"
-                  onSuccess={fetchSerije}
-                />
+            {/* Ocena i dugme u posebnom boxu */}
+            <div className="mt-auto" onClick={e => e.stopPropagation()}>
+              <div className="rounded-md bg-gray-100 dark:bg-gray-700 p-2 flex flex-col items-center">
+                <div className="flex items-center gap-1 mb-1">
+                  <span className="text-sm text-gray-700 dark:text-gray-300 mr-1">Prosečna ocena:</span>
+                  <span className="text-yellow-500 text-lg">⭐</span>
+                  <span className="text-base font-semibold text-gray-900 dark:text-white">{serija.prosecnaOcena?.toFixed(1) ?? "N/A"}</span>
+                </div>
+                {korisnik && (
+                  <GradeInput
+                    userId={korisnik.id}
+                    contentId={serija.id}
+                    contentType="series"
+                    onSuccess={fetchSerije}
+                  />
+                )}
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>

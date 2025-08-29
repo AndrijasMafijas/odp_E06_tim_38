@@ -1,6 +1,8 @@
 import { Router, Request, Response } from "express";
 import { ISeriesService } from "../../Domain/services/series/ISeriesService";
 import { SeriesService } from "../../Services/series/SeriesService";
+import { ITriviesService } from "../../Domain/services/trivies/ITriviesService";
+import { TrivieService } from "../../Services/trivies/TrivieService";
 import { authMiddleware } from "../middlewere/authMiddleware";
 import { adminMiddleware } from "../middlewere/adminMiddleware";
 import { validacijaPodatakaSeries } from "../validators/series/SeriesValidator";
@@ -8,10 +10,12 @@ import { validacijaPodatakaSeries } from "../validators/series/SeriesValidator";
 export class SeriesController {
   private router: Router;
   private seriesService: ISeriesService;
+  private triviaService: ITriviesService;
 
-  constructor(seriesService: ISeriesService = new SeriesService()) {
+  constructor(seriesService: ISeriesService = new SeriesService(), triviaService: ITriviesService = new TrivieService()) {
     this.router = Router();
     this.seriesService = seriesService;
+    this.triviaService = triviaService;
     this.initializeRoutes();
   }
 
@@ -71,21 +75,42 @@ export class SeriesController {
       console.log('Received series data:', req.body);
       const seriesData = req.body;
       
-      // Convert string numbers to actual numbers
-      if (seriesData.brojEpizoda) seriesData.brojEpizoda = parseInt(seriesData.brojEpizoda);
-      if (seriesData.godinaIzdanja) seriesData.godinaIzdanja = parseInt(seriesData.godinaIzdanja);
-      if (!seriesData.prosecnaOcena) seriesData.prosecnaOcena = 0;
+      // Extract trivia data
+      const { triviaPitanje, triviaOdgovor, ...seriesOnlyData } = seriesData;
       
-      console.log('Processed series data:', seriesData);
-      const rezultat = validacijaPodatakaSeries(seriesData);
+      // Convert string numbers to actual numbers
+      if (seriesOnlyData.brojEpizoda) seriesOnlyData.brojEpizoda = parseInt(seriesOnlyData.brojEpizoda);
+      if (seriesOnlyData.godinaIzdanja) seriesOnlyData.godinaIzdanja = parseInt(seriesOnlyData.godinaIzdanja);
+      if (!seriesOnlyData.prosecnaOcena) seriesOnlyData.prosecnaOcena = 0;
+      
+      console.log('Processed series data:', seriesOnlyData);
+      const rezultat = validacijaPodatakaSeries(seriesOnlyData);
       console.log('Validation result:', rezultat);
       if (!rezultat.uspesno) {
         res.status(400).json({ success: false, message: rezultat.poruka });
         return;
       }
-      const series = await this.seriesService.create(seriesData);
+
+      // Validate trivia data
+      if (!triviaPitanje || !triviaOdgovor) {
+        res.status(400).json({ success: false, message: "Триvia питање и одговор су обавезни" });
+        return;
+      }
+      
+      const series = await this.seriesService.create(seriesOnlyData);
       if (series && series.id !== 0) {
-        res.status(201).json({ success: true, message: "Серија успешно додата", data: series });
+        // Create trivia for the series
+        const triviaData = {
+          id: 0,
+          pitanje: triviaPitanje,
+          odgovor: triviaOdgovor,
+          sadrzajId: series.id,
+          tipSadrzaja: 'series'
+        };
+        
+        await this.triviaService.create(triviaData);
+        
+        res.status(201).json({ success: true, message: "Серија и триvia успешно додати", data: series });
       } else {
         res.status(400).json({ success: false, message: "Није могуће додати серију" });
       }
