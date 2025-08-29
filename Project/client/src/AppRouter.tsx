@@ -6,20 +6,10 @@ import { authApi } from "./api_services/auth/AuthAPIService";
 import KatalogFilmova from "./pages/KatalogFilmova";
 import KatalogSerija from "./pages/KatalogSerija";
 import SerieDetail from "./pages/SerieDetail";
+import Pocetna from "./pages/Pocetna";
 import Navigacija from "./components/Navigacija";
 import ThemeToggle from "./components/ThemeToggle";
 import type { UserLoginDto } from "./models/auth/UserLoginDto";
-
-function Pocetna() {
-  // Prikaz nekoliko filmova/serija (dummy prikaz, može se proširiti)
-  return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Добродошли!</h2>
-      <p>Погледајте најновије филмове и серије!</p>
-      {/* Ovde možeš prikazati nekoliko izdvojenih filmova/serija */}
-    </div>
-  );
-}
 
 export default function AppRouter() {
   const [prijavljen, setPrijavljen] = useState<boolean>(() => {

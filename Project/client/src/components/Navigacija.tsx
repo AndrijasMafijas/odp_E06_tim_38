@@ -1,5 +1,6 @@
  
 import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 //import { useDarkMode } from "../helpers/useDarkMode";
 
 interface NavigacijaProps {
@@ -9,7 +10,22 @@ interface NavigacijaProps {
 
 export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
   const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   //const [dark, setDark] = useDarkMode(true);
+  
+  // Zatvori dropdown kada se klikne van njega
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Element;
+      if (dropdownOpen && !target.closest('.profile-dropdown')) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
   const navLinks = [
     { to: "/", label: "Почетна" },
     { to: "/katalog", label: "Каталог филмова" },
@@ -42,12 +58,45 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
 
   <div className="flex items-center space-x-3">
           {prijavljen ? (
-            <button
-              onClick={onLogout}
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold px-5 py-2 rounded-full shadow-md transition-all duration-200 border border-cyan-300/50 hover:border-cyan-200"
-            >
-              Logout
-            </button>
+            <div className="relative profile-dropdown">
+              {/* Profile Icon */}
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white rounded-full shadow-md transition-all duration-200 border border-cyan-300/50 hover:border-cyan-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Мој профил</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Корисник</p>
+                  </div>
+                  
+                  <Link
+                    to="/dashboard"
+                    className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    📊 Контролна табла
+                  </Link>
+                  
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      setDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    🚪 Одјави се
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <Link
