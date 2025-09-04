@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { UserLoginDto } from '../models/auth/UserLoginDto';
-import LogoutConfirmModal from '../components/LogoutConfirmModal';
+import LogoutConfirmModal from '../components/modals/LogoutConfirmModal';
 
 interface MojProfilProps {
   onLogout: () => void;

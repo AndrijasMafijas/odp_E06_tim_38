@@ -1,39 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { userApi } from '../../api_services/UserAPIService';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ServiceFactory } from '../../api_services/factories/ServiceFactory';
 import type { UserLoginDto } from '../../models/auth/UserLoginDto';
 
-const KontrolnaTabla: React.FC = () => {
+interface KontrolnaTablaProps {
+  onLogout?: () => void;
+}
+
+const KontrolnaTabla: React.FC<KontrolnaTablaProps> = () => {
   const [users, setUsers] = useState<UserLoginDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // Dobijanje servisa iz ServiceFactory
+  const userService = ServiceFactory.getUserService();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await userApi.getAllUsers();
-      if (result.success && result.data) {
-        setUsers(result.data);
-      } else {
-        setError(result.message || 'Грешка при учитавању корисника.');
-      }
+      const users = await userService.getAllUsers();
+      // Konvertuj User[] u UserLoginDto[]
+      const userLoginDtos: UserLoginDto[] = users.map(user => ({
+        id: user.id,
+        korisnickoIme: user.korisnickoIme,
+        uloga: user.uloga
+      }));
+      setUsers(userLoginDtos);
     } catch (err) {
       console.error('Greška pri fetchUsers:', err);
       setError('Грешка при учитавању корисника.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [userService]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleRoleChange = async (userId: number, currentRole: string, newRole: 'korisnik' | 'admin') => {
     if (currentRole === newRole) return;
     
     try {
-      const result = await userApi.updateUserRole(userId, newRole);
+      const result = await userService.updateUserRole(userId, { uloga: newRole });
       if (result.success) {
         // Ažuriraj lokalno stanje
         setUsers(prev => prev.map(user => 

@@ -5,7 +5,7 @@ import KontrolnaTabla from "./components/kontrolna_tabla/KontrolnaTabla";
 import AutentifikacionaForma from "./components/autentifikacija/AutentifikacionaForma";
 import { authApi } from "./api_services/auth/AuthAPIService";
 import KatalogFilmova from "./pages/KatalogFilmova";
-import Navigacija from "./components/Navigacija";
+import Navigacija from "./components/navigation/Navigacija";
 
 function Pocetna() {
   // Prikaz nekoliko filmova/serija (dummy prikaz, može se proširiti)

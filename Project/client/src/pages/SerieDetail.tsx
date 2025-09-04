@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import GradeInput from "../components/GradeInput";
+import GradeInput from "../components/forms/GradeInput";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 
 const API_URL = import.meta.env.VITE_API_URL;

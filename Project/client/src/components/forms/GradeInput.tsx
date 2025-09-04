@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import type { GradeDto } from "../models/GradeDto";
-import { gradeApi } from "../api_services/GradeAPIService";
+import type { CreateGradeDto } from "../../types/Grade";
+import { ServiceFactory } from "../../api_services/factories/ServiceFactory";
 
 interface GradeInputProps {
   userId: number;
@@ -15,15 +15,25 @@ const GradeInput: React.FC<GradeInputProps> = ({ userId, contentId, contentType,
   const [message, setMessage] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  const gradeService = ServiceFactory.getGradeService();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
-    const grade: GradeDto = { userId, contentId, contentType, value };
-    const res = await gradeApi.submitGrade(grade);
-    setMessage(res.message);
+    
+    const gradeData: CreateGradeDto = { 
+      ocena: value,
+      userId, 
+      contentId, 
+      contentType 
+    };
+    
+    const result = await gradeService.submitGrade(gradeData);
+    setMessage(result.message);
     setLoading(false);
-    if (res.success) {
+    
+    if (result.success) {
       if (onSuccess) onSuccess();
       setShowForm(false);
       setTimeout(() => setMessage(null), 3000);

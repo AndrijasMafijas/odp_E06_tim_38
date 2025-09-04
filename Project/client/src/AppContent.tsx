@@ -8,8 +8,8 @@ import KatalogSerija from "./pages/KatalogSerija";
 import SerieDetail from "./pages/SerieDetail";
 import Pocetna from "./pages/Pocetna";
 import MojProfil from "./pages/MojProfil";
-import Navigacija from "./components/Navigacija";
-import ThemeToggle from "./components/ThemeToggle";
+import Navigacija from "./components/navigation/Navigacija";
+import ThemeToggle from "./components/ui/ThemeToggle";
 import type { UserLoginDto } from "./models/auth/UserLoginDto";
 
 export default function AppContent() {

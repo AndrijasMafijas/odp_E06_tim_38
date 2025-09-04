@@ -1,10 +1,10 @@
-import { useDarkMode } from "../helpers/useDarkMode";
+import { useDarkMode } from "../../helpers/useDarkMode";
 
 export default function ThemeToggle() {
   const [dark, setDark] = useDarkMode(true);
   return (
     <button
-      onClick={() => setDark((d) => !d)}
+      onClick={() => setDark((d: boolean) => !d)}
       className={`flex items-center px-2 py-1 rounded-md border transition-all duration-200 shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-cyan-400
         ${dark ? "bg-gray-800 text-yellow-300 border-gray-700 hover:bg-gray-700" : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"}`}
       title={dark ? "Prebaci na svetlu temu" : "Prebaci na tamnu temu"}

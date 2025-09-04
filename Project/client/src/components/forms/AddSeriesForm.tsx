@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import type { CreateSeriesDto } from '../../types/Series';
+import { ServiceFactory } from '../../api_services/factories/ServiceFactory';
 
 interface AddSeriesFormProps {
   onSuccess: () => void;
@@ -7,23 +8,29 @@ interface AddSeriesFormProps {
 }
 
 const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateSeriesDto>({
     naziv: '',
     opis: '',
-    brojEpizoda: 1,
     zanr: '',
+    brojSezona: 1,
+    brojEpizoda: 1,
     godinaIzdanja: new Date().getFullYear(),
+    status: 'ongoing',
     triviaPitanje: '',
     triviaOdgovor: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const seriesService = ServiceFactory.getSeriesService();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === 'brojEpizoda' || name === 'godinaIzdanja' ? parseInt(value) || 0 : value
+      [name]: ['brojSezona', 'brojEpizoda', 'godinaIzdanja'].includes(name) 
+        ? parseInt(value) || 0 
+        : value
     });
   };
 
@@ -32,11 +39,13 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
     setLoading(true);
     setError('');
 
-    console.log('Sending series data:', formData);
-
     try {
-              await axios.post('http://localhost:3000/api/v1/series/public', formData);
-      onSuccess();
+      const result = await seriesService.createSeries(formData);
+      if (result.success) {
+        onSuccess();
+      } else {
+        setError(result.message);
+      }
     } catch (err) {
       console.error('Greška pri dodavanju serije:', err);
       setError('Грешка при додавању серије');

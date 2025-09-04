@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
-import { triviaApi } from "../api_services/TriviaAPIService";
-import { seriesApi } from "../api_services/SeriesAPIService";
-import type { TriviaDto } from "../models/TriviaDto";
+import type { Trivia } from "../types/Trivia";
+import { ServiceFactory } from "../api_services/factories/ServiceFactory";
 import axios from "axios";
-import GradeInput from "../components/GradeInput";
-import AddSeriesForm from "../components/AddSeriesForm";
-import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import GradeInput from "../components/forms/GradeInput";
+import AddSeriesForm from "../components/forms/AddSeriesForm";
+import DeleteConfirmModal from "../components/modals/DeleteConfirmModal";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +27,7 @@ type SortOrder = "asc" | "desc";
 
 export default function KatalogSerija() {
   const [serije, setSerije] = useState<Series[]>([]);
-  const [trivije, setTrivije] = useState<Record<number, TriviaDto[]>>({});
+  const [trivije, setTrivije] = useState<Record<number, Trivia[]>>({});
   const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
   const [sortKey, setSortKey] = useState<SortKey>("naziv");
@@ -38,6 +37,10 @@ export default function KatalogSerija() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [seriesToDelete, setSeriesToDelete] = useState<Series | null>(null);
   const navigate = useNavigate();
+
+  // Dobijanje servisa iz ServiceFactory
+  const triviaService = ServiceFactory.getTriviaService();
+  const seriesService = ServiceFactory.getSeriesService();
 
   async function fetchSerije() {
     try {
@@ -61,7 +64,7 @@ export default function KatalogSerija() {
       serije.forEach(async (serija) => {
         if (!trivije[serija.id]) {
           try {
-            const data = await triviaApi.getByContent(serija.id, "series");
+            const data = await triviaService.getTriviasByContent(serija.id, "series");
             setTrivije(prev => ({ ...prev, [serija.id]: data }));
           } catch (error) {
             // Ignore trivia loading errors
@@ -75,7 +78,7 @@ export default function KatalogSerija() {
 
   const handleDeleteSeries = async (series: Series) => {
     try {
-      const result = await seriesApi.deleteSeries(series.id);
+      const result = await seriesService.deleteSeries(series.id);
       if (result.success) {
         setSerije(prev => prev.filter(s => s.id !== series.id));
         setTrivije(prev => {
