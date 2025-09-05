@@ -7,8 +7,8 @@ export class MoviesRepository implements IMoviesRepository {
   async create(movie: Movie): Promise<Movie> {
     try {
       const query = `
-        INSERT INTO movies (naziv, opis, trajanje, zanr, godinaIzdanja, prosecnaOcena)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO movies (naziv, opis, trajanje, zanr, godinaIzdanja, prosecnaOcena, cover_image)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
         movie.naziv,
@@ -16,10 +16,11 @@ export class MoviesRepository implements IMoviesRepository {
         movie.trajanje,
         movie.zanr,
         movie.godinaIzdanja,
-        movie.prosecnaOcena
+        movie.prosecnaOcena,
+        movie.coverImage
       ]);
       if (result.insertId) {
-        return new Movie(result.insertId, movie.naziv, movie.opis, movie.trajanje, movie.zanr, movie.godinaIzdanja, movie.prosecnaOcena);
+        return new Movie(result.insertId, movie.naziv, movie.opis, movie.trajanje, movie.zanr, movie.godinaIzdanja, movie.prosecnaOcena, movie.coverImage);
       }
       return new Movie();
     } catch {
@@ -30,14 +31,14 @@ export class MoviesRepository implements IMoviesRepository {
   async getById(id: number): Promise<Movie> {
     try {
       const query = `
-        SELECT id, naziv, opis, trajanje, zanr, godinaIzdanja, prosecnaOcena
+        SELECT id, naziv, opis, trajanje, zanr, godinaIzdanja, prosecnaOcena, cover_image
         FROM movies
         WHERE id = ?
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
       if (rows.length > 0) {
         const row = rows[0];
-        return new Movie(row.id, row.naziv, row.opis, row.trajanje, row.zanr, row.godinaIzdanja, row.prosecnaOcena);
+        return new Movie(row.id, row.naziv, row.opis, row.trajanje, row.zanr, row.godinaIzdanja, row.prosecnaOcena, row.cover_image || '');
       }
       return new Movie();
     } catch {
@@ -47,16 +48,26 @@ export class MoviesRepository implements IMoviesRepository {
 
   async getAll(): Promise<Movie[]> {
     try {
+      console.log('MoviesRepository.getAll() - Pozivam SQL query...');
       const query = `
-        SELECT id, naziv, opis, trajanje, zanr, godinaIzdanja, prosecnaOcena
+        SELECT id, naziv, opis, trajanje, zanr, godinaIzdanja, prosecnaOcena, cover_image
         FROM movies
         ORDER BY id ASC
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query);
+      console.log(`MoviesRepository.getAll() - Broj redova: ${rows.length}`);
+      if (rows.length > 0) {
+        console.log('Prvi red:', JSON.stringify(rows[0], null, 2));
+      }
       return rows.map(
-        (row) => new Movie(row.id, row.naziv, row.opis, row.trajanje, row.zanr, row.godinaIzdanja, row.prosecnaOcena)
+        (row) => {
+          const movie = new Movie(row.id, row.naziv, row.opis, row.trajanje, row.zanr, row.godinaIzdanja, row.prosecnaOcena, row.cover_image || '');
+          console.log(`Movie ${movie.id}: coverImage length = ${movie.coverImage?.length || 0}`);
+          return movie;
+        }
       );
-    } catch {
+    } catch (error) {
+      console.error('Greška u MoviesRepository.getAll():', error);
       return [];
     }
   }
@@ -65,7 +76,7 @@ export class MoviesRepository implements IMoviesRepository {
     try {
       const query = `
         UPDATE movies
-        SET naziv = ?, opis = ?, trajanje = ?, zanr = ?, godinaIzdanja = ?, prosecnaOcena = ?
+        SET naziv = ?, opis = ?, trajanje = ?, zanr = ?, godinaIzdanja = ?, prosecnaOcena = ?, cover_image = ?
         WHERE id = ?
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
@@ -75,6 +86,7 @@ export class MoviesRepository implements IMoviesRepository {
         movie.zanr,
         movie.godinaIzdanja,
         movie.prosecnaOcena,
+        movie.coverImage,
         movie.id
       ]);
       if (result.affectedRows > 0) {

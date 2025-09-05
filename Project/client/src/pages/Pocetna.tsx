@@ -83,71 +83,85 @@ export default function Pocetna() {
     setRezultatiPretrage(filtrirani);
   }, [pretraga, sviFilmovi, sveSerije]);
 
-  const renderStars = (ocena: number) => {
-    const zvezde = [];
-    const puneZvezde = Math.floor(ocena);
-    const poluZvezda = ocena % 1 >= 0.5;
-    
-    for (let i = 0; i < puneZvezde; i++) {
-      zvezde.push(<span key={i} className="text-yellow-400">★</span>);
-    }
-    
-    if (poluZvezda) {
-      zvezde.push(<span key="half" className="text-yellow-400">★</span>);
-    }
-    
-    const preostaleZvezde = 5 - Math.ceil(ocena);
-    for (let i = 0; i < preostaleZvezde; i++) {
-      zvezde.push(<span key={`empty-${i}`} className="text-gray-300 dark:text-gray-600">★</span>);
-    }
-    
-    return zvezde;
-  };
-
   const renderCard = (item: Movie | Series, tip: 'film' | 'serija') => (
-    <div key={`${tip}-${item.id}`} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+    <div key={`${tip}-${item.id}`} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
       {/* Poster area */}
-      <div className="bg-gradient-to-br from-blue-500 to-purple-600 h-64 rounded-t-lg flex items-center justify-center">
-        <span className="text-white text-3xl font-bold">
-          {item.naziv.charAt(0)}
-        </span>
+      <div className="relative h-64 overflow-hidden">
+        {item.coverUrl ? (
+          <img 
+            src={item.coverUrl} 
+            alt={item.naziv} 
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+            onError={(e) => {
+              console.log('Greška pri učitavanju slike:', e);
+              // Fallback na gradient ako slika ne može da se učita
+              (e.target as HTMLImageElement).style.display = 'none';
+              const parent = (e.target as HTMLImageElement).parentElement;
+              if (parent) {
+                parent.className = "bg-gradient-to-br from-blue-500 to-purple-600 h-64 flex items-center justify-center";
+                parent.innerHTML = `<span class="text-white text-3xl font-bold">${item.naziv.charAt(0)}</span>`;
+              }
+            }}
+          />
+        ) : (
+          <div className="bg-gradient-to-br from-blue-500 to-purple-600 h-64 flex items-center justify-center">
+            <span className="text-white text-3xl font-bold">
+              {item.naziv.charAt(0)}
+            </span>
+          </div>
+        )}
+        
+        {/* Overlay sa ocenom */}
+        <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded-lg text-sm font-semibold flex items-center gap-1">
+          <span className="text-yellow-400">★</span>
+          {item.prosecnaOcena.toFixed(1)}
+        </div>
       </div>
       
-      <div className="p-6">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 truncate">
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 truncate">
           {item.naziv}
         </h3>
         
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex">{renderStars(item.prosecnaOcena)}</div>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            ({item.prosecnaOcena.toFixed(1)})
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            {tip}
           </span>
+          {item.zanr && (
+            <>
+              <span className="text-gray-300 dark:text-gray-600">•</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {item.zanr}
+              </span>
+            </>
+          )}
         </div>
         
         {'brojSezona' in item && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+          <p className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
             {item.brojSezona} sezona{item.brojSezona !== 1 ? 'a' : ''}
           </p>
         )}
         
-        <p className="text-sm text-gray-700 dark:text-gray-300 overflow-hidden h-16" style={{
-          display: '-webkit-box',
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: 'vertical',
-          textOverflow: 'ellipsis'
-        }}>
+        <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mb-3">
           {item.opis}
         </p>
         
-        {tip === 'serija' && (
-          <Link
-            to={`/serije/${item.id}`}
-            className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
-          >
-            Pogledaj detalje
-          </Link>
-        )}
+        <div className="flex justify-between items-center">
+          {tip === 'serija' && (
+            <Link
+              to={`/serije/${item.id}`}
+              className="inline-block px-3 py-1 bg-blue-500 text-white rounded-md text-xs hover:bg-blue-600 transition-colors"
+            >
+              Detalji
+            </Link>
+          )}
+          {tip === 'film' && (
+            <div className="px-3 py-1 bg-green-500 text-white rounded-md text-xs">
+              Film
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

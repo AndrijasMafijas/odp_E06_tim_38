@@ -6,6 +6,7 @@ import { TrivieService } from "../../Services/trivies/TrivieService";
 import { authMiddleware } from "../middlewere/authMiddleware";
 import { adminMiddleware } from "../middlewere/adminMiddleware";
 import { validacijaPodatakaMovie } from "../validators/movies/MovieValidator";
+import { Movie } from "../../Domain/models/Movie";
 
 export class MovieController {
   private router: Router;
@@ -32,12 +33,39 @@ export class MovieController {
     this.router.delete("/movies/:id", authMiddleware, adminMiddleware, this.deleteMovie.bind(this));
   }
 
+  private transformMovieForResponse(movie: Movie): any {
+    console.log('Transform movie:', movie.id, 'coverImage length:', movie.coverImage?.length || 0);
+    let coverUrl;
+    if (movie.coverImage && movie.coverImage.trim()) {
+      // Proverava da li Base64 string već ima data URL prefix
+      if (movie.coverImage.startsWith('data:image/')) {
+        coverUrl = movie.coverImage;
+      } else {
+        // Dodaje data URL prefix za Base64 string
+        coverUrl = `data:image/jpeg;base64,${movie.coverImage}`;
+      }
+      console.log('Generated coverUrl for movie', movie.id, ':', coverUrl.substring(0, 100) + '...');
+    }
+    
+    return {
+      id: movie.id,
+      naziv: movie.naziv,
+      opis: movie.opis,
+      trajanje: movie.trajanje,
+      zanr: movie.zanr,
+      godinaIzdanja: movie.godinaIzdanja,
+      prosecnaOcena: movie.prosecnaOcena,
+      coverUrl: coverUrl
+    };
+  }
+
   private async getAllMovies(req: Request, res: Response): Promise<void> {
     try {
       console.log("GET /movies - Pokušavam da učitam filmove...");
       const movies = await this.movieService.getAll();
       console.log(`Pronađeno filmova: ${movies.length}`);
-      res.json(movies);
+      const moviesWithCoverUrl = movies.map(movie => this.transformMovieForResponse(movie));
+      res.json(moviesWithCoverUrl);
     } catch (error) {
       console.error("Greška pri učitavanju filmova:", error);
       res.status(500).json({ success: false, message: "Greška pri učitavanju filmova" });
@@ -47,7 +75,8 @@ export class MovieController {
   private async getMovieById(req: Request, res: Response): Promise<void> {
     const id = Number(req.params.id);
     const movie = await this.movieService.getById(id);
-    res.json(movie);
+    const movieWithCoverUrl = this.transformMovieForResponse(movie);
+    res.json(movieWithCoverUrl);
   }
 
   private async createMovie(req: Request, res: Response): Promise<void> {
