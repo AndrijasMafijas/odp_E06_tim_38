@@ -17,20 +17,20 @@ export class TriviaRepository implements ITriviaRepository {
       return response.data;
     } catch (error) {
       console.error('Greška pri učitavanju trivia:', error);
-      throw new Error('Грешка при учитавању trivia');
+      throw new Error('Greška pri učitavanju trivia');
     }
   }
 
   async create(data: CreateTriviaDto): Promise<{ success: boolean; message: string }> {
     try {
       await axios.post(`${this.baseUrl}/trivias`, data);
-      return { success: true, message: 'Trivia је успешно додата' };
+      return { success: true, message: 'Trivia je uspešno dodata' };
     } catch (error: unknown) {
       console.error('Greška pri dodavanju trivia:', error);
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при додавању trivia' 
+        message: axiosError?.response?.data?.message || 'Greška pri dodavanju trivia' 
       };
     }
   }

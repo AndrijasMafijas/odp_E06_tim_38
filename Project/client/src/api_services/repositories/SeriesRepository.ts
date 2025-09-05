@@ -15,7 +15,7 @@ export class SeriesRepository implements ISeriesRepository {
       return response.data;
     } catch (error) {
       console.error('Greška pri učitavanju serija:', error);
-      throw new Error('Грешка при учитавању серија');
+      throw new Error('Greška pri učitavanju serija');
     }
   }
 
@@ -28,7 +28,7 @@ export class SeriesRepository implements ISeriesRepository {
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при уклањању серије.' 
+        message: axiosError?.response?.data?.message || 'Greška pri uklanjanju serije.' 
       };
     }
   }
@@ -36,13 +36,13 @@ export class SeriesRepository implements ISeriesRepository {
   async create(data: CreateSeriesDto): Promise<{ success: boolean; message: string }> {
     try {
       await axios.post(`${this.baseUrl}/series/public`, data);
-      return { success: true, message: 'Серија је успешно додата' };
+      return { success: true, message: 'Serija je uspešno dodata' };
     } catch (error: unknown) {
       console.error('Greška pri dodavanju serije:', error);
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при додавању серије' 
+        message: axiosError?.response?.data?.message || 'Greška pri dodavanju serije' 
       };
     }
   }

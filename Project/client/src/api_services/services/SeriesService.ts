@@ -14,7 +14,7 @@ export class SeriesService implements ISeriesService {
 
   async deleteSeries(seriesId: number): Promise<{ success: boolean; message: string }> {
     if (seriesId <= 0) {
-      return { success: false, message: 'Невалидан ID серије' };
+      return { success: false, message: 'Nevalidan ID serije' };
     }
     return await this.seriesRepository.delete(seriesId);
   }
@@ -22,10 +22,10 @@ export class SeriesService implements ISeriesService {
   async createSeries(seriesData: CreateSeriesDto): Promise<{ success: boolean; message: string }> {
     // Validacija podataka
     if (!seriesData.naziv?.trim()) {
-      return { success: false, message: 'Назив серије је обавезан' };
+      return { success: false, message: 'Naziv serije je obavezan' };
     }
     if (!seriesData.opis?.trim()) {
-      return { success: false, message: 'Опис серије је обавезан' };
+      return { success: false, message: 'Opis serije je obavezan' };
     }
     
     return await this.seriesRepository.create(seriesData);

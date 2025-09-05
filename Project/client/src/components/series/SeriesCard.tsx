@@ -40,16 +40,16 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
       </p>
       <div className="space-y-1 mb-3">
         <p className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="font-medium">Жанр:</span> {series.zanr ?? "-"}
+          <span className="font-medium">Žanr:</span> {series.zanr ?? "-"}
         </p>
         {series.brojSezona && (
           <p className="text-xs text-gray-600 dark:text-gray-400">
-            <span className="font-medium">Сезоне:</span> {series.brojSezona}
+            <span className="font-medium">Sezone:</span> {series.brojSezona}
           </p>
         )}
         {series.status && (
           <p className="text-xs text-gray-600 dark:text-gray-400">
-            <span className="font-medium">Статус:</span> {series.status}
+            <span className="font-medium">Status:</span> {series.status}
           </p>
         )}
         {trivia && trivia[0] && (
@@ -83,7 +83,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
                 onClick={handleDeleteClick}
                 className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-1"
               >
-                🗑️ Уклони серију
+                🗑️ Ukloni seriju
               </button>
             )}
           </div>

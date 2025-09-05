@@ -11,16 +11,16 @@ export class GradeService implements IGradeService {
   async submitGrade(gradeData: CreateGradeDto): Promise<{ success: boolean; message: string }> {
     // Validacija podataka
     if (gradeData.ocena < 1 || gradeData.ocena > 10) {
-      return { success: false, message: 'Оцена мора бити између 1 и 10' };
+      return { success: false, message: 'Ocena mora biti između 1 i 10' };
     }
     if (gradeData.userId <= 0) {
-      return { success: false, message: 'Невалидан ID корисника' };
+      return { success: false, message: 'Nevalidan ID korisnika' };
     }
     if (gradeData.contentId <= 0) {
-      return { success: false, message: 'Невалидан ID садржаја' };
+      return { success: false, message: 'Nevalidan ID sadržaja' };
     }
     if (!['movie', 'series'].includes(gradeData.contentType)) {
-      return { success: false, message: 'Невалидан тип садржаја' };
+      return { success: false, message: 'Nevalidan tip sadržaja' };
     }
     
     return await this.gradeRepository.submit(gradeData);
@@ -28,7 +28,7 @@ export class GradeService implements IGradeService {
 
   async getUserGrades(userId: number): Promise<Grade[]> {
     if (userId <= 0) {
-      throw new Error('Невалидан ID корисника');
+      throw new Error('Nevalidan ID korisnika');
     }
     
     return await this.gradeRepository.fetchByUser(userId);

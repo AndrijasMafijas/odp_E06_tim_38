@@ -36,7 +36,7 @@ export function useSeries(seriesService: ISeriesService): UseSeriesResult {
       setSeries(fetchedSeries);
     } catch (err) {
       console.error('Greška pri učitavanju serija:', err);
-      setError('Грешка при учитавању серија');
+      setError('Greška pri učitavanju serija');
     } finally {
       setLoading(false);
     }

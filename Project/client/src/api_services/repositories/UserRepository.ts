@@ -15,7 +15,7 @@ export class UserRepository implements IUserRepository {
       return response.data;
     } catch (error) {
       console.error('Greška pri učitavanju korisnika:', error);
-      throw new Error('Грешка при учитавању корисника');
+      throw new Error('Greška pri učitavanju korisnika');
     }
   }
 
@@ -28,7 +28,7 @@ export class UserRepository implements IUserRepository {
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при ажурирању улоге корисника.' 
+        message: axiosError?.response?.data?.message || 'Greška pri ažuriranju uloge korisnika.' 
       };
     }
   }
@@ -36,13 +36,13 @@ export class UserRepository implements IUserRepository {
   async create(data: CreateUserDto): Promise<{ success: boolean; message: string }> {
     try {
       await axios.post(`${this.baseUrl}/users`, data);
-      return { success: true, message: 'Корисник је успешно креиран' };
+      return { success: true, message: 'Korisnik je uspešno kreiran' };
     } catch (error: unknown) {
       console.error('Greška pri kreiranju korisnika:', error);
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при креирању корисника' 
+        message: axiosError?.response?.data?.message || 'Greška pri kreiranju korisnika' 
       };
     }
   }

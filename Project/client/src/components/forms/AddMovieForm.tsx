@@ -46,7 +46,7 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
       }
     } catch (err) {
       console.error('Greška pri dodavanju filma:', err);
-      setError('Грешка при додавању филма');
+      setError('Greška pri dodavanju filma');
     } finally {
       setLoading(false);
     }
@@ -55,11 +55,11 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-md">
-        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Додај нови филм</h3>
+        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Dodaj novi film</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormInput
-            label="Назив"
+            label="Naziv"
             name="naziv"
             value={formData.naziv}
             onChange={handleChange}
@@ -67,7 +67,7 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
           />
 
           <FormTextarea
-            label="Опис"
+            label="Opis"
             name="opis"
             value={formData.opis}
             onChange={handleChange}
@@ -77,14 +77,14 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
 
           <div className="grid grid-cols-2 gap-3">
             <FormInput
-              label="Трајање (мин)"
+              label="Trajanje (min)"
               name="trajanje"
               value={formData.trajanje || ''}
               onChange={handleChange}
             />
 
             <FormInput
-              label="Година издања"
+              label="Godina izdanja"
               name="godinaIzdanja"
               type="number"
               value={formData.godinaIzdanja || ''}
@@ -95,14 +95,14 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
           </div>
 
           <FormInput
-            label="Жанр"
+            label="Žanr"
             name="zanr"
             value={formData.zanr || ''}
             onChange={handleChange}
           />
 
           <FormTextarea
-            label="Trivia питање"
+            label="Trivia pitanje"
             name="triviaPitanje"
             value={formData.triviaPitanje || ''}
             onChange={handleChange}
@@ -111,7 +111,7 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
           />
 
           <FormInput
-            label="Trivia одговор"
+            label="Trivia odgovor"
             name="triviaOdgovor"
             value={formData.triviaOdgovor || ''}
             onChange={handleChange}
@@ -121,8 +121,8 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
           {error && <div className="text-red-600 dark:text-red-400 text-sm">{error}</div>}
 
           <FormButtons
-            primaryText="Додај филм"
-            secondaryText="Откажи"
+            primaryText="Dodaj film"
+            secondaryText="Otkaži"
             onPrimaryClick={() => {}}
             onSecondaryClick={onCancel}
             primaryDisabled={loading}

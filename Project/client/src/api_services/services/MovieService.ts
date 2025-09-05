@@ -14,7 +14,7 @@ export class MovieService implements IMovieService {
 
   async deleteMovie(movieId: number): Promise<{ success: boolean; message: string }> {
     if (movieId <= 0) {
-      return { success: false, message: 'Невалидан ID филма' };
+      return { success: false, message: 'Nevalidan ID filma' };
     }
     return await this.movieRepository.delete(movieId);
   }
@@ -22,10 +22,10 @@ export class MovieService implements IMovieService {
   async createMovie(movieData: CreateMovieDto): Promise<{ success: boolean; message: string }> {
     // Validacija podataka
     if (!movieData.naziv?.trim()) {
-      return { success: false, message: 'Назив филма је обавезан' };
+      return { success: false, message: 'Naziv filma je obavezan' };
     }
     if (!movieData.opis?.trim()) {
-      return { success: false, message: 'Опис филма је обавезан' };
+      return { success: false, message: 'Opis filma je obavezan' };
     }
     
     return await this.movieRepository.create(movieData);

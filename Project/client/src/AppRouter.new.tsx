@@ -11,8 +11,8 @@ function Pocetna() {
   // Prikaz nekoliko filmova/serija (dummy prikaz, može se proširiti)
   return (
     <div style={{ padding: "2rem" }}>
-      <h2>Добродошли!</h2>
-      <p>Погледајте најновије филмове и серије!</p>
+      <h2>Dobrodošli!</h2>
+      <p>Pogledajte najnovije filmove i serije!</p>
       {/* Ovde možeš prikazati nekoliko izdvojenih filmova/serija */}
     </div>
   );
@@ -35,7 +35,7 @@ export default function AppRouter() {
         <Route path="/" element={<Pocetna />} />
         <Route path="/katalog" element={<KatalogFilmova />} />
         {/* Dodaj rutu za serije */}
-        <Route path="/serije" element={<div style={{padding:'2rem'}}><h2>Каталог серија</h2><p>Ускоро...</p></div>} />
+        <Route path="/serije" element={<div style={{padding:'2rem'}}><h2>Katalog serija</h2><p>Uskoro...</p></div>} />
         <Route path="/login" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={() => setPrijavljen(true)} />} />
         <Route path="/signup" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={() => setPrijavljen(true)} />} />
         <Route path="/dashboard" element={prijavljen ? <KontrolnaTabla onLogout={() => setPrijavljen(false)} /> : <Navigate to="/login" />} />

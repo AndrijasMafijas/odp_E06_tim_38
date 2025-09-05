@@ -5,16 +5,16 @@ export function validacijaPodatakaGrade(gradeData: any) {
   const ocena = gradeData.value || gradeData.ocena;
   
   if (korisnikId === undefined || isNaN(Number(korisnikId)) || Number(korisnikId) <= 0) {
-    return { uspesno: false, poruka: 'ID korisnika је обавезан и мора бити позитиван број.' };
+    return { uspesno: false, poruka: 'ID korisnika je obavezan i mora biti pozitivan broj.' };
   }
   if (sadrzajId === undefined || isNaN(Number(sadrzajId)) || Number(sadrzajId) <= 0) {
-    return { uspesno: false, poruka: 'ID садржаја је обавезан и мора бити позитиван број.' };
+    return { uspesno: false, poruka: 'ID sadržaja je obavezan i mora biti pozitivan broj.' };
   }
   if (ocena === undefined || isNaN(Number(ocena)) || Number(ocena) < 1 || Number(ocena) > 10) {
-    return { uspesno: false, poruka: 'Оцена мора бити број између 1 и 10.' };
+    return { uspesno: false, poruka: 'Ocena mora biti broj između 1 i 10.' };
   }
   if (gradeData.komentar && typeof gradeData.komentar !== 'string') {
-    return { uspesno: false, poruka: 'Коментар мора бити текст.' };
+    return { uspesno: false, poruka: 'Komentar mora biti tekst.' };
   }
   return { uspesno: true };
 }

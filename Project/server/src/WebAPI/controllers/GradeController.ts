@@ -68,13 +68,13 @@ export class GradeController {
       
       const createdGrade = await this.gradeService.create(grade);
       if (createdGrade && createdGrade.id !== 0) {
-        res.status(201).json({ success: true, message: "Оцена успешно сачувана", data: createdGrade });
+        res.status(201).json({ success: true, message: "Ocena uspešno sačuvana", data: createdGrade });
       } else {
-        res.status(400).json({ success: false, message: "Није могуће сачувати оцену" });
+        res.status(400).json({ success: false, message: "Nije moguće sačuvati ocenu" });
       }
     } catch (error) {
       console.error("Greška pri čuvanju ocene:", error);
-      res.status(500).json({ success: false, message: "Грешка на серверу" });
+      res.status(500).json({ success: false, message: "Greška na serveru" });
     }
   }
 

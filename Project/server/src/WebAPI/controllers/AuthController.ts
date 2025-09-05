@@ -41,7 +41,7 @@ export class AuthController {
         res.status(200).json({success: true, message: 'Uspešna prijava', data: result});
         return;
       } else {
-        res.status(401).json({success: false, message: 'Неисправно корисничко име или лозинка'});
+        res.status(401).json({success: false, message: 'Neispravno korisničko ime ili lozinka'});
         return;
       }
     } catch (error) {
@@ -73,7 +73,7 @@ export class AuthController {
       if (result.id !== 0) {
         res.status(201).json({success: true, message: 'Uspešna registracija', data: result});
       } else {
-        res.status(401).json({success: false, message: 'Регистрација није успела. Корисничко име већ постоји.', });
+        res.status(401).json({success: false, message: 'Registracija nije uspela. Korisničko ime već postoji.', });
       }
     } catch (error) {
       res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});
@@ -101,7 +101,7 @@ export class AuthController {
       if (result.id !== 0) {
         res.status(201).json({success: true, message: 'Uspešna registracija admin korisnika', data: result});
       } else {
-        res.status(401).json({success: false, message: 'Регистрација админа није успела. Корисничко име већ постоји.', });
+        res.status(401).json({success: false, message: 'Registracija admina nije uspela. Korisničko ime već postoji.', });
       }
     } catch (error) {
       res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});

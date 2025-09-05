@@ -25,12 +25,12 @@ const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isOpen, onClose
             </svg>
           </div>
           <h3 className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">
-            Потврдите одјављивање
+            Potvrdite odjavljvanje
           </h3>
         </div>
         
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Да ли сте сигурни да желите да се одјавите? Мораћете поново да се пријавите да бисте приступили вашем налогу.
+          Da li ste sigurni da želite da se odjavite? Moraćete ponovo da se prijavite da biste pristupili vašem nalogu.
         </p>
         
         <div className="flex gap-3 justify-end">
@@ -38,7 +38,7 @@ const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isOpen, onClose
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium rounded-lg transition-colors duration-200"
           >
-            Откажи
+            Otkaži
           </button>
           <button
             onClick={() => {
@@ -47,7 +47,7 @@ const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({ isOpen, onClose
             }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
           >
-            Одјави се
+            Odjavi se
           </button>
         </div>
       </div>

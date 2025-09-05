@@ -48,7 +48,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
       }
     } catch (err) {
       console.error('Greška pri dodavanju serije:', err);
-      setError('Грешка при додавању серије');
+      setError('Greška pri dodavanju serije');
     } finally {
       setLoading(false);
     }
@@ -57,12 +57,12 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-md">
-        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Додај нову серију</h3>
+        <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Dodaj novu seriju</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Назив *
+              Naziv *
             </label>
             <input
               type="text"
@@ -76,7 +76,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Опис *
+              Opis *
             </label>
             <textarea
               name="opis"
@@ -91,7 +91,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Број епизода *
+                Broj epizoda *
               </label>
               <input
                 type="number"
@@ -106,7 +106,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Година издања
+                Godina izdanja
               </label>
               <input
                 type="number"
@@ -122,7 +122,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Жанр
+              Žanr
             </label>
             <input
               type="text"
@@ -135,7 +135,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Триvia питање *
+              Trivia pitanje *
             </label>
             <textarea
               name="triviaPitanje"
@@ -149,7 +149,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Триvia одговор *
+              Trivia odgovor *
             </label>
             <input
               type="text"
@@ -169,14 +169,14 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
               disabled={loading}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? 'Снимање...' : 'Додај серију'}
+              {loading ? 'Snimanje...' : 'Dodaj seriju'}
             </button>
             <button
               type="button"
               onClick={onCancel}
               className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
-              Откажи
+              Otkaži
             </button>
           </div>
         </form>

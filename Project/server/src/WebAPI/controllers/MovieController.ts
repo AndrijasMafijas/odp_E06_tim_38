@@ -84,7 +84,7 @@ export class MovieController {
 
       // Validate trivia data
       if (!triviaPitanje || !triviaOdgovor) {
-        res.status(400).json({ success: false, message: "Триvia питање и одговор су обавезни" });
+        res.status(400).json({ success: false, message: "Trivia pitanje i odgovor su obavezni" });
         return;
       }
       
@@ -101,13 +101,13 @@ export class MovieController {
         
         await this.triviaService.create(triviaData);
         
-        res.status(201).json({ success: true, message: "Филм и триvia успешно додати", data: movie });
+        res.status(201).json({ success: true, message: "Film i trivia uspešno dodati", data: movie });
       } else {
-        res.status(400).json({ success: false, message: "Није могуће додати филм" });
+        res.status(400).json({ success: false, message: "Nije moguće dodati film" });
       }
     } catch (error) {
       console.error("Greška pri kreiranju filma:", error);
-      res.status(500).json({ success: false, message: "Грешка на серверу" });
+      res.status(500).json({ success: false, message: "Greška na serveru" });
     }
   }
 
@@ -142,14 +142,14 @@ export class MovieController {
       
       if (success) {
         console.log(`Film ${id} je uspešno obrisan`);
-        res.status(200).json({ success: true, message: "Филм је успешно уклоњен." });
+        res.status(200).json({ success: true, message: "Film je uspešno uklonjen." });
       } else {
         console.log(`Neuspešno brisanje filma ${id}`);
-        res.status(404).json({ success: false, message: "Филм није пронађен." });
+        res.status(404).json({ success: false, message: "Film nije pronađen." });
       }
     } catch (error) {
       console.error("Greška pri brisanju filma:", error);
-      res.status(500).json({ success: false, message: "Грешка при уклањању филма." });
+      res.status(500).json({ success: false, message: "Greška pri uklanjanju filma." });
     }
   }
 

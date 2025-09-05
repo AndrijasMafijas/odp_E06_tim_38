@@ -33,13 +33,13 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             </svg>
           </div>
           <h3 className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">
-            Потврдите брисање
+            Potvrdite brisanje
           </h3>
         </div>
         
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Да ли сте сигурни да желите да уклоните {itemType} <strong>"{itemName}"</strong>? 
-          Ова акција се не може опозвати.
+          Da li ste sigurni da želite da uklonite {itemType} <strong>"{itemName}"</strong>? 
+          Ova akcija se ne može opozvati.
         </p>
         
         <div className="flex gap-3 justify-end">
@@ -47,7 +47,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium rounded-lg transition-colors duration-200"
           >
-            Откажи
+            Otkaži
           </button>
           <button
             onClick={() => {
@@ -56,7 +56,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
           >
-            Уклони {itemType}
+            Ukloni {itemType}
           </button>
         </div>
       </div>

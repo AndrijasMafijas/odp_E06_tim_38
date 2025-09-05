@@ -47,11 +47,11 @@ const GradeInput: React.FC<GradeInputProps> = ({ userId, contentId, contentType,
           onClick={() => setShowForm(true)}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-3 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         >
-          ⭐ Оцени
+          ⭐ Oceni
         </button>
         {message && (
           <div className={`mt-2 text-sm text-center ${
-            message.includes('успешно') || message.includes('Успешно') 
+            message.includes('uspešno') || message.includes('Uspešno') 
               ? 'text-green-600 dark:text-green-400' 
               : 'text-red-600 dark:text-red-400'
           }`}>
@@ -67,7 +67,7 @@ const GradeInput: React.FC<GradeInputProps> = ({ userId, contentId, contentType,
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Твоја оцена:
+            Tvoja ocena:
           </label>
           <select 
             value={value} 
@@ -89,20 +89,20 @@ const GradeInput: React.FC<GradeInputProps> = ({ userId, contentId, contentType,
             disabled={loading}
             className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-medium py-2 px-3 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            {loading ? "Снимање..." : "✓ Потврди"}
+            {loading ? "Snimanje..." : "✓ Potvrdi"}
           </button>
           <button 
             type="button"
             onClick={() => setShowForm(false)}
             className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 rounded-md text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
           >
-            Откажи
+            Otkaži
           </button>
         </div>
         
         {message && (
           <div className={`text-sm text-center ${
-            message.includes('успешно') || message.includes('Успешно') 
+            message.includes('uspešno') || message.includes('Uspešno') 
               ? 'text-green-600 dark:text-green-400' 
               : 'text-red-600 dark:text-red-400'
           }`}>

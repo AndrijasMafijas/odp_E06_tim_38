@@ -34,8 +34,8 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
   if (!korisnik) {
     return (
       <div className="p-4 text-center">
-        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Грешка</h2>
-        <p className="text-gray-600 dark:text-gray-300">Корисник није пронађен. Молим вас пријавите се поново.</p>
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Greška</h2>
+        <p className="text-gray-600 dark:text-gray-300">Korisnik nije pronađen. Molim vas prijavite se ponovo.</p>
       </div>
     );
   }
@@ -52,8 +52,8 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
               </svg>
             </div>
             <div className="ml-4">
-              <h1 className="text-2xl font-bold text-white">Мој профил</h1>
-              <p className="text-white/80">Добродошли у ваш лични простор</p>
+              <h1 className="text-2xl font-bold text-white">Moj profil</h1>
+              <p className="text-white/80">Dobrodošli u vaš lični prostor</p>
             </div>
           </div>
         </div>
@@ -62,11 +62,11 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
         <div className="px-6 py-6">
           <div className="space-y-6">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Основни подаци</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Osnovni podaci</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                   <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Корисничко име
+                    Korisničko ime
                   </label>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     {korisnik.korisnickoIme}
@@ -75,7 +75,7 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
                 
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                   <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Улога
+                    Uloga
                   </label>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
                     <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${
@@ -83,14 +83,14 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
                         ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
                         : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
                     }`}>
-                      {korisnik.uloga === 'admin' ? '👑 Администратор' : '👤 Корисник'}
+                      {korisnik.uloga === 'admin' ? '👑 Administrator' : '👤 Korisnik'}
                     </span>
                   </p>
                 </div>
                 
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                   <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    ID корисника
+                    ID korisnika
                   </label>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white">
                     #{korisnik.id}
@@ -99,10 +99,10 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
 
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                   <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Статус
+                    Status
                   </label>
                   <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                    ✅ Активан
+                    ✅ Aktivan
                   </p>
                 </div>
               </div>
@@ -110,7 +110,7 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
 
             {/* Actions */}
             <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Акције</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Akcije</h2>
               <div className="flex flex-wrap gap-3">
                 {korisnik.uloga === 'admin' && (
                   <button className="flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors duration-200">
@@ -118,7 +118,7 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Администраторске опције
+                    Administratorske opcije
                   </button>
                 )}
                 
@@ -129,7 +129,7 @@ const MojProfil: React.FC<MojProfilProps> = ({ onLogout }) => {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                  Одјави се
+                  Odjavi se
                 </button>
               </div>
             </div>

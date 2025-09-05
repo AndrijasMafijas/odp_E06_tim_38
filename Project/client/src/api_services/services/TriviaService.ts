@@ -10,10 +10,10 @@ export class TriviaService implements ITriviaService {
 
   async getTriviasByContent(contentId: number, contentType: 'movie' | 'series'): Promise<Trivia[]> {
     if (contentId <= 0) {
-      throw new Error('Невалидан ID садржаја');
+      throw new Error('Nevalidan ID sadržaja');
     }
     if (!['movie', 'series'].includes(contentType)) {
-      throw new Error('Невалидан тип садржаја');
+      throw new Error('Nevalidan tip sadržaja');
     }
     
     return await this.triviaRepository.fetchByContent(contentId, contentType);
@@ -22,13 +22,13 @@ export class TriviaService implements ITriviaService {
   async createTrivia(triviaData: CreateTriviaDto): Promise<{ success: boolean; message: string }> {
     // Validacija podataka
     if (!triviaData.pitanje?.trim()) {
-      return { success: false, message: 'Питање је обавезно' };
+      return { success: false, message: 'Pitanje je obavezno' };
     }
     if (!triviaData.odgovor?.trim()) {
-      return { success: false, message: 'Одговор је обавезан' };
+      return { success: false, message: 'Odgovor je obavezan' };
     }
     if (triviaData.contentId <= 0) {
-      return { success: false, message: 'Невалидан ID садржаја' };
+      return { success: false, message: 'Nevalidan ID sadržaja' };
     }
     
     return await this.triviaRepository.create(triviaData);

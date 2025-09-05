@@ -93,15 +93,15 @@ export class UserController {
         console.log(`Uloga korisnika ${id} je ažurirana na: ${uloga}`);
         res.status(200).json({ 
           success: true, 
-          message: `Корисник је успешно ${uloga === 'admin' ? 'унапређен у администратора' : 'враћен на корисника'}.` 
+          message: `Korisnik je uspešno ${uloga === 'admin' ? 'unapređen u administratora' : 'vraćen na korisnika'}.` 
         });
       } else {
         console.log(`Neuspešno ažuriranje uloge za korisnika ${id}`);
-        res.status(404).json({ success: false, message: "Корисник није пронађен." });
+        res.status(404).json({ success: false, message: "Korisnik nije pronađen." });
       }
     } catch (error) {
       console.error("Greška pri ažuriranju uloge:", error);
-      res.status(500).json({ success: false, message: "Грешка при ажурирању улоге корисника." });
+      res.status(500).json({ success: false, message: "Greška pri ažuriranju uloge korisnika." });
     }
   }
 

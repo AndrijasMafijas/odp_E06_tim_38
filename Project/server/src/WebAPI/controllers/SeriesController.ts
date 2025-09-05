@@ -94,7 +94,7 @@ export class SeriesController {
 
       // Validate trivia data
       if (!triviaPitanje || !triviaOdgovor) {
-        res.status(400).json({ success: false, message: "Триvia питање и одговор су обавезни" });
+        res.status(400).json({ success: false, message: "Trivia pitanje i odgovor su obavezni" });
         return;
       }
       
@@ -111,13 +111,13 @@ export class SeriesController {
         
         await this.triviaService.create(triviaData);
         
-        res.status(201).json({ success: true, message: "Серија и триvia успешно додати", data: series });
+        res.status(201).json({ success: true, message: "Serija i trivia uspešno dodati", data: series });
       } else {
-        res.status(400).json({ success: false, message: "Није могуће додати серију" });
+        res.status(400).json({ success: false, message: "Nije moguće dodati seriju" });
       }
     } catch (error) {
       console.error("Greška pri kreiranju serije:", error);
-      res.status(500).json({ success: false, message: "Грешка на серверу" });
+      res.status(500).json({ success: false, message: "Greška na serveru" });
     }
   }
 
@@ -152,14 +152,14 @@ export class SeriesController {
       
       if (success) {
         console.log(`Serija ${id} je uspešno obrisana`);
-        res.status(200).json({ success: true, message: "Серија је успешно уклоњена." });
+        res.status(200).json({ success: true, message: "Serija je uspešno uklonjena." });
       } else {
         console.log(`Neuspešno brisanje serije ${id}`);
-        res.status(404).json({ success: false, message: "Серија није пронађена." });
+        res.status(404).json({ success: false, message: "Serija nije pronađena." });
       }
     } catch (error) {
       console.error("Greška pri brisanju serije:", error);
-      res.status(500).json({ success: false, message: "Грешка при уклањању серије." });
+      res.status(500).json({ success: false, message: "Greška pri uklanjanju serije." });
     }
   }
 

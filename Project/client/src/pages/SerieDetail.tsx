@@ -37,7 +37,7 @@ export default function SerieDetail() {
   useEffect(() => {
     async function loadSerija() {
       if (!id) {
-        setGreska("Неважећи ID серије");
+        setGreska("Nevazeći ID serije");
         setUcitava(false);
         return;
       }
@@ -47,7 +47,7 @@ export default function SerieDetail() {
         setSerija(res.data);
       } catch (err) {
         console.error("Greška pri učitavanju serije:", err);
-        setGreska("Серија није пронађена");
+        setGreska("Serija nije pronađena");
       } finally {
         setUcitava(false);
       }
@@ -59,7 +59,7 @@ export default function SerieDetail() {
   if (ucitava) {
     return (
       <div className="p-4 text-center text-gray-600 dark:text-gray-300">
-        Учитавање...
+        Učitavanje...
       </div>
     );
   }
@@ -72,7 +72,7 @@ export default function SerieDetail() {
           onClick={() => navigate("/serije")}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
         >
-          Назад на каталог серија
+          Nazad na katalog serija
         </button>
       </div>
     );
@@ -81,7 +81,7 @@ export default function SerieDetail() {
   if (!serija) {
     return (
       <div className="p-4 text-center text-red-600 dark:text-red-400">
-        Серија није пронађена
+        Serija nije pronađena
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function SerieDetail() {
         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Назад
+        Nazad
       </button>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
@@ -126,19 +126,19 @@ export default function SerieDetail() {
             
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Жанр:</span>
-                <p className="text-gray-900 dark:text-white">{serija.zanr ?? "Непознат"}</p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">Žanr:</span>
+                <p className="text-gray-900 dark:text-white">{serija.zanr ?? "Nepoznat"}</p>
               </div>
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Број сезона:</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">Broj sezona:</span>
                 <p className="text-gray-900 dark:text-white">{serija.brojSezona}</p>
               </div>
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Година издања:</span>
-                <p className="text-gray-900 dark:text-white">{serija.godinaIzdanja ?? "Непознато"}</p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">Godina izdanja:</span>
+                <p className="text-gray-900 dark:text-white">{serija.godinaIzdanja ?? "Nepoznato"}</p>
               </div>
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Просечна оцена:</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">Prosečna ocena:</span>
                 <p className="text-gray-900 dark:text-white text-lg font-bold">
                   {serija.prosecnaOcena?.toFixed(2) ?? "N/A"} / 10
                 </p>
@@ -146,7 +146,7 @@ export default function SerieDetail() {
             </div>
             
             <div className="mb-6">
-              <span className="font-semibold text-gray-700 dark:text-gray-300 text-lg">Опис:</span>
+              <span className="font-semibold text-gray-700 dark:text-gray-300 text-lg">Opis:</span>
               <p className="text-gray-700 dark:text-gray-300 mt-2 leading-relaxed">
                 {serija.opis}
               </p>
@@ -155,7 +155,7 @@ export default function SerieDetail() {
             {korisnik && (
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-                  Оцените ову серију:
+                  Ocenite ovu seriju:
                 </h3>
                 <GradeInput
                   userId={korisnik.id}

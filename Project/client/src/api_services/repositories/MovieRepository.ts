@@ -15,7 +15,7 @@ export class MovieRepository implements IMovieRepository {
       return response.data;
     } catch (error) {
       console.error('Greška pri učitavanju filmova:', error);
-      throw new Error('Грешка при учитавању филмова');
+      throw new Error('Greška pri učitavanju filmova');
     }
   }
 
@@ -28,7 +28,7 @@ export class MovieRepository implements IMovieRepository {
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при уклањању филма.' 
+        message: axiosError?.response?.data?.message || 'Greška pri uklanjanju filma.' 
       };
     }
   }
@@ -36,13 +36,13 @@ export class MovieRepository implements IMovieRepository {
   async create(data: CreateMovieDto): Promise<{ success: boolean; message: string }> {
     try {
       await axios.post(`${this.baseUrl}/movies/public`, data);
-      return { success: true, message: 'Филм је успешно додат' };
+      return { success: true, message: 'Film je uspešno dodat' };
     } catch (error: unknown) {
       console.error('Greška pri dodavanju filma:', error);
       const axiosError = error as { response?: { data?: { message?: string } } };
       return { 
         success: false, 
-        message: axiosError?.response?.data?.message || 'Грешка при додавању филма' 
+        message: axiosError?.response?.data?.message || 'Greška pri dodavanju filma' 
       };
     }
   }

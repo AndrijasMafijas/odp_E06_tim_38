@@ -48,7 +48,7 @@ export default function KatalogFilmova() {
       }
     } catch (error) {
       console.error("Greška pri brisanju filma:", error);
-      alert("Грешка при уклањању филма.");
+      alert("Greška pri uklanjanju filma.");
     }
     setShowDeleteModal(false);
     setMovieToDelete(null);
@@ -64,12 +64,12 @@ export default function KatalogFilmova() {
     refreshMovies();
   };
 
-  if (loading) return <div className="p-4 text-center text-gray-600 dark:text-gray-300">Учитавање...</div>;
+  if (loading) return <div className="p-4 text-center text-gray-600 dark:text-gray-300">Učitavanje...</div>;
   if (error) return <div className="p-4 text-center text-red-600 dark:text-red-400">{error}</div>;
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Каталог филмова</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Katalog filmova</h2>
       
       <MovieFilters
         sortConfig={sortConfig}

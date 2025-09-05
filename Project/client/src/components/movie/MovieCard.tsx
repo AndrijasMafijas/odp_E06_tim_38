@@ -40,7 +40,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
       </p>
       <div className="space-y-1 mb-3">
         <p className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="font-medium">Жанр:</span> {movie.zanr ?? "-"}
+          <span className="font-medium">Žanr:</span> {movie.zanr ?? "-"}
         </p>
         {trivia && trivia[0] && (
           <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivia[0].pitanje}>
@@ -73,7 +73,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
                 onClick={handleDeleteClick}
                 className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-1"
               >
-                🗑️ Уклони филм
+                🗑️ Ukloni film
               </button>
             )}
           </div>

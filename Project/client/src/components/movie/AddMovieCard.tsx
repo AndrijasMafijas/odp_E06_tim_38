@@ -14,10 +14,10 @@ export const AddMovieCard: React.FC<AddMovieCardProps> = ({ onAddMovie }) => {
         +
       </div>
       <h3 className="font-semibold text-lg text-gray-600 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-center">
-        Додај нови филм
+        Dodaj novi film
       </h3>
       <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 text-center">
-        Кликни да додаш филм
+        Klikni da dodaš film
       </p>
     </div>
   );

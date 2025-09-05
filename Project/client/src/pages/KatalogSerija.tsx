@@ -48,7 +48,7 @@ export default function KatalogSerija() {
       setSerije(res.data);
     } catch (err) {
       console.error("Greška pri učitavanju serija:", err);
-      setGreska("Грешка при учитавању серија");
+      setGreska("Greška pri učitavanju serija");
     } finally {
       setUcitava(false);
     }
@@ -91,7 +91,7 @@ export default function KatalogSerija() {
       }
     } catch (error) {
       console.error("Greška pri brisanju serije:", error);
-      alert("Грешка при уклањању серије.");
+      alert("Greška pri uklanjanju serije.");
     }
   };
 
@@ -120,7 +120,7 @@ export default function KatalogSerija() {
     navigate(`/serije/${serijaId}`);
   };
 
-  if (ucitava) return <div className="p-4 text-center text-gray-600 dark:text-gray-300">Учитавање...</div>;
+  if (ucitava) return <div className="p-4 text-center text-gray-600 dark:text-gray-300">Učitavanje...</div>;
   if (greska) return <div className="p-4 text-center text-red-600 dark:text-red-400">{greska}</div>;
 
   // Prijavljeni korisnik iz localStorage
@@ -135,33 +135,33 @@ export default function KatalogSerija() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Каталог серија</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Katalog serija</h2>
       </div>
       
       <div className="flex flex-wrap gap-4 mb-4 items-end">
         <input
           type="text"
-          placeholder="Претрага по називу..."
+          placeholder="Pretraga po nazivu..."
           className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={pretraga}
           onChange={e => setPretraga(e.target.value)}
         />
-        <label className="text-gray-700 dark:text-gray-200">Сортирај по:</label>
+        <label className="text-gray-700 dark:text-gray-200">Sortiraj po:</label>
         <select 
           value={sortKey} 
           onChange={e => setSortKey(e.target.value as SortKey)} 
           className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="naziv">Називу</option>
-          <option value="prosecnaOcena">Просечној оцени</option>
+          <option value="naziv">Nazivu</option>
+          <option value="prosecnaOcena">Prosečnoj oceni</option>
         </select>
         <select 
           value={sortOrder} 
           onChange={e => setSortOrder(e.target.value as SortOrder)} 
           className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="asc">Растуће</option>
-          <option value="desc">Опадајуће</option>
+          <option value="asc">Rastuće</option>
+          <option value="desc">Opadajuće</option>
         </select>
       </div>
       
@@ -176,10 +176,10 @@ export default function KatalogSerija() {
               +
             </div>
             <h3 className="font-semibold text-lg text-gray-600 dark:text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-center">
-              Додај нову серију
+              Dodaj novu seriju
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-500 mt-2 text-center">
-              Кликни да додаш серију
+              Klikni da dodaš seriju
             </p>
           </div>
         )}
@@ -198,10 +198,10 @@ export default function KatalogSerija() {
             <p className="text-sm mb-3 text-gray-700 dark:text-gray-300 line-clamp-2">{serija.opis}</p>
             <div className="space-y-1 mb-3">
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                <span className="font-medium">Жанр:</span> {serija.zanr ?? "-"}
+                <span className="font-medium">Žanr:</span> {serija.zanr ?? "-"}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                <span className="font-medium">Сезоне:</span> {serija.brojSezona} | <span className="font-medium">Година:</span> {serija.godinaIzdanja}
+                <span className="font-medium">Sezone:</span> {serija.brojSezona} | <span className="font-medium">Godina:</span> {serija.godinaIzdanja}
               </p>
               {trivije[serija.id] && trivije[serija.id][0] && (
                 <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivije[serija.id][0].pitanje}>
@@ -231,7 +231,7 @@ export default function KatalogSerija() {
                       onClick={() => openDeleteModal(serija)}
                       className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center gap-1"
                     >
-                      🗑️ Уклони серију
+                      🗑️ Ukloni seriju
                     </button>
                   )}
                 </div>

@@ -141,11 +141,11 @@ export default function Pocetna() {
         </p>
         
         {tip === 'serija' && (
-          <Link 
+          <Link
             to={`/serije/${item.id}`}
             className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
           >
-            Погледај детаље
+            Pogledaj detalje
           </Link>
         )}
       </div>
@@ -155,7 +155,7 @@ export default function Pocetna() {
   if (ucitava) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
-        <div className="text-2xl text-gray-600 dark:text-gray-400">Учитавам податке...</div>
+        <div className="text-2xl text-gray-600 dark:text-gray-400">Učitavam podatke...</div>
       </div>
     );
   }
@@ -165,11 +165,11 @@ export default function Pocetna() {
       <div className="container mx-auto px-4 py-8">
         {/* Hero sekcija */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Добродошли!
+          <h1 className="text-4xl md:text-6xl font-bold text-cyan-600 dark:text-cyan-400 mb-4">
+            Dobrodošli!
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-            Погледајте најновије филмове и серије!
+            Pogledajte najnovije filmove i serije!
           </p>
           
           {/* Search Bar */}
@@ -177,7 +177,7 @@ export default function Pocetna() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Претражите филмове и серије..."
+                placeholder="Pretražite filmove i serije..."
                 value={pretraga}
                 onChange={(e) => setPretraga(e.target.value)}
                 className="w-full px-4 py-3 pl-10 pr-4 text-gray-900 bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
@@ -194,7 +194,7 @@ export default function Pocetna() {
           {pretraga && rezultatiPretrage.length > 0 && (
             <div className="mb-8">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Резултати претраге
+                Rezultati pretrage
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rezultatiPretrage.map(item => 
@@ -207,7 +207,7 @@ export default function Pocetna() {
           {pretraga && rezultatiPretrage.length === 0 && (
             <div className="mb-8">
               <p className="text-gray-600 dark:text-gray-400">
-                Нема резултата за "{pretraga}"
+                Nema rezultata za "{pretraga}"
               </p>
             </div>
           )}
@@ -218,10 +218,10 @@ export default function Pocetna() {
           <div className="text-center mb-12">
             <div className="bg-yellow-100 dark:bg-yellow-900 border border-yellow-300 dark:border-yellow-700 rounded-lg p-6 max-w-2xl mx-auto">
               <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                💡 Нема података из базе
+                💡 Nema podataka iz baze
               </h3>
               <p className="text-yellow-700 dark:text-yellow-300">
-                Потребно је да повежеш MySQL базу података и додаш филмове и серије да би видео садржај овде.
+                Potrebno je da povežeš MySQL bazu podataka i dodaš filmove i serije da bi video sadržaj ovde.
               </p>
             </div>
           </div>
@@ -231,7 +231,7 @@ export default function Pocetna() {
         {topFilmovi.length > 0 && (
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              🏆 Топ 3 најбоља филма
+              🏆 Top 3 najbolja filma
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {topFilmovi.map(film => renderCard(film, 'film'))}
@@ -243,7 +243,7 @@ export default function Pocetna() {
         {topSerije.length > 0 && (
           <section className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-              🏆 Топ 3 најбоље серије
+              🏆 Top 3 najbolje serije
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {topSerije.map(serija => renderCard(serija, 'serija'))}

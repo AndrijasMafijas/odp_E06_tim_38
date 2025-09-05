@@ -36,7 +36,7 @@ export function useMovies(movieService: IMovieService): UseMoviesResult {
       setMovies(fetchedMovies);
     } catch (err) {
       console.error('Greška pri učitavanju filmova:', err);
-      setError('Грешка при учитавању филмова');
+      setError('Greška pri učitavanju filmova');
     } finally {
       setLoading(false);
     }
