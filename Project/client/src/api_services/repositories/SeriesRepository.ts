@@ -11,8 +11,20 @@ export class SeriesRepository implements ISeriesRepository {
 
   async fetchAll(): Promise<Series[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}/series`);
-      return response.data;
+      // Dodaj cache busting parametar
+      const timestamp = new Date().getTime();
+      const response = await axios.get(`${this.baseUrl}/series?_t=${timestamp}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      // Mapiranje backend podataka na frontend format
+      const mapiraneSerije = response.data.map((serija: any) => ({
+        ...serija,
+        coverImage: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+      }));
+      return mapiraneSerije;
     } catch (error) {
       console.error('Greška pri učitavanju serija:', error);
       throw new Error('Greška pri učitavanju serija');

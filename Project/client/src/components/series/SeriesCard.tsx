@@ -25,9 +25,9 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
 
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between">
-      {series.coverUrl && (
+      {series.coverImage && (
         <img 
-          src={series.coverUrl} 
+          src={series.coverImage} 
           alt={series.naziv} 
           className="mb-3 w-full h-48 object-cover rounded-md" 
         />

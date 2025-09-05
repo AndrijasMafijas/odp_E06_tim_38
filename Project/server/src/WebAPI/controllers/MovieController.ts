@@ -34,7 +34,14 @@ export class MovieController {
   }
 
   private transformMovieForResponse(movie: Movie): any {
-    console.log('Transform movie:', movie.id, 'coverImage length:', movie.coverImage?.length || 0);
+    console.log('=== TRANSFORM MOVIE ===');
+    console.log('Movie ID:', movie.id);
+    console.log('Movie naziv:', movie.naziv);
+    console.log('Movie opis:', movie.opis?.substring(0, 50) + '...');
+    console.log('Movie zanr:', movie.zanr);
+    console.log('Movie godinaIzdanja:', movie.godinaIzdanja);
+    console.log('Movie coverImage length:', movie.coverImage?.length || 0);
+    
     let coverUrl;
     if (movie.coverImage && movie.coverImage.trim()) {
       // Proverava da li Base64 string već ima data URL prefix
@@ -47,7 +54,7 @@ export class MovieController {
       console.log('Generated coverUrl for movie', movie.id, ':', coverUrl.substring(0, 100) + '...');
     }
     
-    return {
+    const result = {
       id: movie.id,
       naziv: movie.naziv,
       opis: movie.opis,
@@ -57,6 +64,12 @@ export class MovieController {
       prosecnaOcena: movie.prosecnaOcena,
       coverUrl: coverUrl
     };
+    
+    console.log('=== FINAL RESULT ===');
+    console.log('Result:', JSON.stringify(result, null, 2));
+    console.log('====================');
+    
+    return result;
   }
 
   private async getAllMovies(req: Request, res: Response): Promise<void> {
@@ -65,6 +78,14 @@ export class MovieController {
       const movies = await this.movieService.getAll();
       console.log(`Pronađeno filmova: ${movies.length}`);
       const moviesWithCoverUrl = movies.map(movie => this.transformMovieForResponse(movie));
+      
+      // Dodaj no-cache headers
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      
       res.json(moviesWithCoverUrl);
     } catch (error) {
       console.error("Greška pri učitavanju filmova:", error);

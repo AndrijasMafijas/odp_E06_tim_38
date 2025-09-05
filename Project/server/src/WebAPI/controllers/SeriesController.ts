@@ -32,12 +32,41 @@ export class SeriesController {
     this.router.delete("/series/:id", authMiddleware, adminMiddleware, this.deleteSeries.bind(this));
   }
 
+  private transformSeriesForResponse(series: any): any {
+    console.log('Transform series:', series.id, 'coverImage length:', series.coverImage?.length || 0);
+    let coverUrl;
+    if (series.coverImage && series.coverImage.trim()) {
+      // Proverava da li Base64 string već ima data URL prefix
+      if (series.coverImage.startsWith('data:image/')) {
+        coverUrl = series.coverImage;
+      } else {
+        // Dodaje data URL prefix za Base64 string
+        coverUrl = `data:image/jpeg;base64,${series.coverImage}`;
+      }
+      console.log('Generated coverUrl for series', series.id, ':', coverUrl.substring(0, 100) + '...');
+    }
+    
+    return {
+      ...series,
+      coverUrl: coverUrl
+    };
+  }
+
   private async getAllSeries(req: Request, res: Response): Promise<void> {
     try {
       console.log("GET /series - Pokušavam da učitam serije...");
       const series = await this.seriesService.getAll();
       console.log(`Pronađeno serija: ${series.length}`);
-      res.json(series);
+      const seriesWithCoverUrl = series.map(s => this.transformSeriesForResponse(s));
+      
+      // Dodaj no-cache headers
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      
+      res.json(seriesWithCoverUrl);
     } catch (error) {
       console.error("Greška pri učitavanju serija:", error);
       res.status(500).json({ success: false, message: "Greška pri učitavanju serija" });
@@ -53,7 +82,8 @@ export class SeriesController {
         res.status(404).json({ success: false, message: "Serija nije pronađena" });
         return;
       }
-      res.json(series);
+      const seriesWithCoverUrl = this.transformSeriesForResponse(series);
+      res.json(seriesWithCoverUrl);
     } catch (error) {
       console.error("Greška pri učitavanju serije:", error);
       res.status(500).json({ success: false, message: "Greška pri učitavanju serije" });

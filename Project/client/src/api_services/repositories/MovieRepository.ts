@@ -11,8 +11,25 @@ export class MovieRepository implements IMovieRepository {
 
   async fetchAll(): Promise<Movie[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}/movies`);
-      return response.data;
+      // Dodaj cache busting parametar
+      const timestamp = new Date().getTime();
+      const response = await axios.get(`${this.baseUrl}/movies?_t=${timestamp}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      // Mapiranje backend podataka na frontend format
+      const mapiraniFilmovi = response.data.map((film: any) => ({
+        id: film.id,
+        naziv: film.naziv,
+        opis: film.opis,
+        prosecnaOcena: film.prosecnaOcena,
+        zanr: film.zanr,
+        godinaIzdanja: film.godinaIzdanja,
+        coverImage: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+      }));
+      return mapiraniFilmovi;
     } catch (error) {
       console.error('Greška pri učitavanju filmova:', error);
       throw new Error('Greška pri učitavanju filmova');

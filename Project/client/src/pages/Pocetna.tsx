@@ -10,7 +10,7 @@ interface Movie {
   opis: string;
   prosecnaOcena: number;
   zanr?: string;
-  coverUrl?: string;
+  coverImage?: string;
 }
 
 interface Series {
@@ -21,7 +21,7 @@ interface Series {
   brojSezona: number;
   zanr?: string;
   godinaIzdanja?: number;
-  coverUrl?: string;
+  coverImage?: string;
 }
 
 export default function Pocetna() {
@@ -36,25 +36,52 @@ export default function Pocetna() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Učitaj filmove i serije
+        // Učitaj filmove i serije sa cache busting
+        const timestamp = new Date().getTime();
         const [filmResponse, serijeResponse] = await Promise.all([
-          axios.get(`${API_URL}movies`),
-          axios.get(`${API_URL}series`)
+          axios.get(`${API_URL}movies?_t=${timestamp}`, {
+            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          }),
+          axios.get(`${API_URL}series?_t=${timestamp}`, {
+            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          })
         ]);
 
+        // Mapiranje backend podataka na frontend format za serije
+        const mapiraneSerije = serijeResponse.data.map((serija: any) => ({
+          id: serija.id,
+          naziv: serija.naziv,
+          opis: serija.opis,
+          prosecnaOcena: serija.prosecnaOcena,
+          brojSezona: serija.brojSezona, // Ispravno mapiranje - broj sezona iz baze
+          zanr: serija.zanr,
+          godinaIzdanja: serija.godinaIzdanja,
+          coverImage: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+        }));
+
+        // Mapiranje backend podataka na frontend format za filmove
+        const mapiraniFilmovi = filmResponse.data.map((film: any) => ({
+          id: film.id,
+          naziv: film.naziv,
+          opis: film.opis,
+          prosecnaOcena: film.prosecnaOcena,
+          zanr: film.zanr,
+          coverImage: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+        }));
+
         // Sortiraj po prosečnoj oceni i uzmi top 3
-        const sortedFilmovi = filmResponse.data
+        const sortedFilmovi = mapiraniFilmovi
           .sort((a: Movie, b: Movie) => b.prosecnaOcena - a.prosecnaOcena)
           .slice(0, 3);
         
-        const sortedSerije = serijeResponse.data
+        const sortedSerije = mapiraneSerije
           .sort((a: Series, b: Series) => b.prosecnaOcena - a.prosecnaOcena)
           .slice(0, 3);
 
         setTopFilmovi(sortedFilmovi);
         setTopSerije(sortedSerije);
-        setSviFilmovi(filmResponse.data);
-        setSveSerije(serijeResponse.data);
+        setSviFilmovi(mapiraniFilmovi);
+        setSveSerije(mapiraneSerije);
       } catch (error) {
         console.error("Greška pri učitavanju podataka:", error);
       } finally {
@@ -87,9 +114,9 @@ export default function Pocetna() {
     <div key={`${tip}-${item.id}`} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
       {/* Poster area */}
       <div className="relative h-64 overflow-hidden">
-        {item.coverUrl ? (
+        {item.coverImage ? (
           <img 
-            src={item.coverUrl} 
+            src={item.coverImage} 
             alt={item.naziv} 
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             onError={(e) => {

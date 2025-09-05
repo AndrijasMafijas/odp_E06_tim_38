@@ -19,7 +19,7 @@ interface Series {
   brojSezona: number;
   zanr?: string;
   godinaIzdanja?: number;
-  coverUrl?: string;
+  coverImage?: string;
 }
 
 type SortKey = "naziv" | "prosecnaOcena";
@@ -45,7 +45,18 @@ export default function KatalogSerija() {
   async function fetchSerije() {
     try {
       const res = await axios.get(`${API_URL}series`);
-      setSerije(res.data);
+      // Mapiranje backend podataka na frontend format
+      const mapiraneSerije = res.data.map((serija: any) => ({
+        id: serija.id,
+        naziv: serija.naziv,
+        opis: serija.opis,
+        prosecnaOcena: serija.prosecnaOcena,
+        brojSezona: serija.brojEpizoda, // Backend ima brojEpizoda, frontend očekuje brojSezona
+        zanr: serija.zanr,
+        godinaIzdanja: serija.godinaIzdanja,
+        coverImage: serija.coverImage ? `data:image/webp;base64,${serija.coverImage}` : undefined // Pretvaramo u data URL
+      }));
+      setSerije(mapiraneSerije);
     } catch (err) {
       console.error("Greška pri učitavanju serija:", err);
       setGreska("Greška pri učitavanju serija");
@@ -191,8 +202,8 @@ export default function KatalogSerija() {
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between"
             onClick={() => handleSerijaClick(serija.id)}
           >
-            {serija.coverUrl && (
-              <img src={serija.coverUrl} alt={serija.naziv} className="mb-3 w-full h-48 object-cover rounded-md" />
+            {serija.coverImage && (
+              <img src={serija.coverImage} alt={serija.naziv} className="mb-3 w-full h-48 object-cover rounded-md" />
             )}
             <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white line-clamp-1">{serija.naziv}</h3>
             <p className="text-sm mb-3 text-gray-700 dark:text-gray-300 line-clamp-2">{serija.opis}</p>

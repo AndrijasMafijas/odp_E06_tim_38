@@ -26,10 +26,10 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-all duration-200 flex flex-col h-full">
       {/* Slika filma */}
-      {movie.coverUrl && (
+      {movie.coverImage && (
         <div className="relative w-full h-64 overflow-hidden">
           <img 
-            src={movie.coverUrl} 
+            src={movie.coverImage} 
             alt={movie.naziv} 
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" 
             onError={(e) => {

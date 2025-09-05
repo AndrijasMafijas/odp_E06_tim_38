@@ -101,6 +101,14 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
             onChange={handleChange}
           />
 
+          <FormInput
+            label="URL slike naslovnice"
+            name="coverImage"
+            value={formData.coverImage || ''}
+            onChange={handleChange}
+            placeholder="https://example.com/slika.jpg"
+          />
+
           <FormTextarea
             label="Trivia pitanje"
             name="triviaPitanje"

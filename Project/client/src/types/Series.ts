@@ -4,7 +4,7 @@ export interface Series {
   opis: string;
   prosecnaOcena: number;
   zanr?: string;
-  coverUrl?: string;
+  coverImage?: string;
   brojSezona?: number;
   brojEpizoda?: number;
   godinaIzdanja?: number;
@@ -19,6 +19,7 @@ export interface CreateSeriesDto {
   brojEpizoda?: number;
   godinaIzdanja?: number;
   status?: string;
+  coverImage?: string;
   triviaPitanje?: string;
   triviaOdgovor?: string;
 }
