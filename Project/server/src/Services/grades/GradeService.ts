@@ -10,6 +10,18 @@ export class GradeService implements IGradeService {
   }
 
   async create(grade: Grade): Promise<Grade> {
+    // Proveriti da li korisnik već ima ocenu za ovaj sadržaj
+    const hasGraded = await this.gradesRepository.userHasGraded(
+      grade.korisnikId, 
+      grade.sadrzajId, 
+      grade.tipSadrzaja
+    );
+    
+    if (hasGraded) {
+      // Vratiti prazan objekat ako korisnik već ima ocenu
+      return new Grade();
+    }
+    
     return await this.gradesRepository.create(grade);
   }
 

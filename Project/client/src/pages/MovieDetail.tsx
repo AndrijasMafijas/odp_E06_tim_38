@@ -58,7 +58,7 @@ export default function MovieDetail() {
   if (ucitava) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-600"></div>
       </div>
     );
   }
@@ -71,7 +71,7 @@ export default function MovieDetail() {
           <p className="text-gray-600 dark:text-gray-400 mb-4">{greska}</p>
           <button
             onClick={() => navigate("/")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
           >
             Povratak na početnu
           </button>

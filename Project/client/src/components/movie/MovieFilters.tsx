@@ -31,7 +31,7 @@ export const MovieFilters: React.FC<MovieFiltersProps> = ({
       <input
         type="text"
         placeholder="Pretraga po nazivu..."
-        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
         value={filterConfig.searchTerm}
         onChange={handleSearchChange}
       />
@@ -39,7 +39,7 @@ export const MovieFilters: React.FC<MovieFiltersProps> = ({
       <select 
         value={sortConfig.key} 
         onChange={handleSortKeyChange} 
-        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
       >
         <option value="naziv">Nazivu</option>
         <option value="prosecnaOcena">Prosečnoj oceni</option>
@@ -47,7 +47,7 @@ export const MovieFilters: React.FC<MovieFiltersProps> = ({
       <select 
         value={sortConfig.order} 
         onChange={handleSortOrderChange} 
-        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
       >
         <option value="asc">Rastuće</option>
         <option value="desc">Opadajuće</option>

@@ -20,7 +20,7 @@ interface Series {
   naziv: string;
   opis: string;
   prosecnaOcena: number;
-  brojSezona: number;
+  brojEpizoda: number;
   zanr?: string;
   godinaIzdanja?: number;
   cover_image?: string;
@@ -57,7 +57,7 @@ export default function KatalogSerija() {
           naziv: serija.naziv,
           opis: serija.opis,
           prosecnaOcena: serija.prosecnaOcena,
-          brojSezona: serija.brojEpizoda, // Backend ima brojEpizoda, frontend očekuje brojSezona
+          brojEpizoda: serija.brojEpizoda, // Backend šalje brojEpizoda
           zanr: serija.zanr,
           godinaIzdanja: serija.godinaIzdanja,
           cover_image: serija.coverUrl || serija.cover_image // Backend šalje coverUrl, frontend koristi cover_image
@@ -230,10 +230,10 @@ export default function KatalogSerija() {
                 <span className="font-medium">Žanr:</span> {serija.zanr ?? "-"}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                <span className="font-medium">Sezone:</span> {serija.brojSezona} | <span className="font-medium">Godina:</span> {serija.godinaIzdanja}
+                <span className="font-medium">Epizode:</span> {serija.brojEpizoda} | <span className="font-medium">Godina:</span> {serija.godinaIzdanja}
               </p>
               {trivije[serija.id] && trivije[serija.id][0] && (
-                <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivije[serija.id][0].pitanje}>
+                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1" title={trivije[serija.id][0].pitanje}>
                   <span className="font-medium">Trivia:</span> {trivije[serija.id][0].pitanje}
                 </p>
               )}

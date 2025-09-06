@@ -23,7 +23,7 @@ export const FormButtons: React.FC<FormButtonsProps> = ({
         type="submit"
         onClick={onPrimaryClick}
         disabled={primaryDisabled || loading}
-        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
       >
         {loading ? 'Snimanje...' : primaryText}
       </button>

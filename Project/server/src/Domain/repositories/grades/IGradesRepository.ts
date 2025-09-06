@@ -44,4 +44,13 @@ export interface IGradesRepository {
    * @returns Promise koji vraća true ako ocena postoji, false inače
    */
   exists(id: number): Promise<boolean>;
+
+  /**
+   * Proverava da li je korisnik već ocenio određeni sadržaj
+   * @param korisnikId - ID korisnika
+   * @param sadrzajId - ID sadržaja
+   * @param tipSadrzaja - Tip sadržaja (movie, series, episode)
+   * @returns Promise koji vraća true ako je korisnik već ocenio, false inače
+   */
+  userHasGraded(korisnikId: number, sadrzajId: number, tipSadrzaja: string): Promise<boolean>;
 }

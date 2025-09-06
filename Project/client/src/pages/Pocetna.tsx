@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import type { Trivia } from "../types/Trivia";
-import { useTrivias } from "../hooks/useTrivias";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,7 +10,7 @@ interface Movie {
   opis: string;
   prosecnaOcena: number;
   zanr?: string;
-  cover_image?: string;
+  coverImage?: string;
 }
 
 interface Series {
@@ -21,10 +18,10 @@ interface Series {
   naziv: string;
   opis: string;
   prosecnaOcena: number;
-  brojSezona: number;
+  brojEpizoda: number;
   zanr?: string;
   godinaIzdanja?: number;
-  cover_image?: string;
+  coverImage?: string;
 }
 
 export default function Pocetna() {
@@ -35,17 +32,6 @@ export default function Pocetna() {
   const [ucitava, setUcitava] = useState(true);
   const [pretraga, setPretraga] = useState("");
   const [rezultatiPretrage, setRezultatiPretrage] = useState<(Movie | Series)[]>([]);
-
-  // Hook-ovi za trivia podatke
-  const movieIds = useMemo(() => topFilmovi.map(movie => movie.id), [topFilmovi]);
-  const seriesIds = useMemo(() => topSerije.map(series => series.id), [topSerije]);
-  const allMovieIds = useMemo(() => sviFilmovi.map(movie => movie.id), [sviFilmovi]);
-  const allSeriesIds = useMemo(() => sveSerije.map(series => series.id), [sveSerije]);
-  
-  const movieTrivias = useTrivias(movieIds, 'movie');
-  const seriesTrivias = useTrivias(seriesIds, 'series');
-  const allMovieTrivias = useTrivias(allMovieIds, 'movie');
-  const allSeriesTrivias = useTrivias(allSeriesIds, 'series');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,10 +53,10 @@ export default function Pocetna() {
           naziv: serija.naziv,
           opis: serija.opis,
           prosecnaOcena: serija.prosecnaOcena,
-          brojSezona: serija.brojSezona, // Ispravno mapiranje - broj sezona iz baze
+          brojEpizoda: serija.brojEpizoda, // Mapiranje broja epizoda iz baze
           zanr: serija.zanr,
           godinaIzdanja: serija.godinaIzdanja,
-          cover_image: serija.coverUrl || serija.cover_image // Backend šalje coverUrl, frontend koristi cover_image
+          coverImage: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
         }));
 
         // Mapiranje backend podataka na frontend format za filmove
@@ -80,7 +66,7 @@ export default function Pocetna() {
           opis: film.opis,
           prosecnaOcena: film.prosecnaOcena,
           zanr: film.zanr,
-          cover_image: film.coverUrl || film.cover_image // Backend šalje coverUrl, frontend koristi cover_image
+          coverImage: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
         }));
 
         // Sortiraj po prosečnoj oceni i uzmi top 3
@@ -124,13 +110,13 @@ export default function Pocetna() {
     setRezultatiPretrage(filtrirani);
   }, [pretraga, sviFilmovi, sveSerije]);
 
-  const renderCard = (item: Movie | Series, tip: 'film' | 'serija', trivia?: Trivia[]) => (
+  const renderCard = (item: Movie | Series, tip: 'film' | 'serija') => (
     <div key={`${tip}-${item.id}`} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
       {/* Poster area */}
       <div className="relative h-64 overflow-hidden">
-        {item.cover_image ? (
+        {item.coverImage ? (
           <img 
-            src={item.cover_image} 
+            src={item.coverImage} 
             alt={item.naziv} 
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             onError={(e) => {
@@ -181,24 +167,12 @@ export default function Pocetna() {
         <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mb-3">
           {item.opis}
         </p>
-
-        {/* Trivia sekcija */}
-        {trivia && trivia.length > 0 && (
-          <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 rounded-md border-l-4 border-yellow-400">
-            <div className="flex items-center gap-1 mb-1">
-              <span className="text-yellow-600 dark:text-yellow-400 text-xs font-medium">💡 Trivia:</span>
-            </div>
-            <p className="text-xs text-gray-700 dark:text-gray-300">
-              {trivia[0].pitanje}
-            </p>
-          </div>
-        )}
         
         <div className="flex justify-between items-center">
           {tip === 'serija' && (
             <Link
               to={`/serije/${item.id}`}
-              className="inline-block px-3 py-1 bg-blue-500 text-white rounded-md text-xs hover:bg-blue-600 transition-colors"
+              className="inline-block px-3 py-1 bg-cyan-500 text-white rounded-md text-xs hover:bg-cyan-600 transition-colors"
             >
               Detalji
             </Link>
@@ -206,7 +180,7 @@ export default function Pocetna() {
           {tip === 'film' && (
             <Link
               to={`/filmovi/${item.id}`}
-              className="inline-block px-3 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-green-600 transition-colors"
+              className="inline-block px-3 py-1 bg-cyan-500 text-white rounded-md text-xs hover:bg-cyan-600 transition-colors"
             >
               Detalji
             </Link>
@@ -244,7 +218,7 @@ export default function Pocetna() {
                 placeholder="Pretražite filmove i serije..."
                 value={pretraga}
                 onChange={(e) => setPretraga(e.target.value)}
-                className="w-full px-4 py-3 pl-10 pr-4 text-gray-900 bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
+                className="w-full px-4 py-3 pl-10 pr-4 text-gray-900 bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors duration-300"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,11 +235,9 @@ export default function Pocetna() {
                 Rezultati pretrage
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {rezultatiPretrage.map(item => {
-                  const tipSadrzaja = 'brojSezona' in item ? 'serija' : 'film';
-                  const trivia = tipSadrzaja === 'serija' ? allSeriesTrivias[item.id] : allMovieTrivias[item.id];
-                  return renderCard(item, tipSadrzaja, trivia);
-                })}
+                {rezultatiPretrage.map(item => 
+                  renderCard(item, 'brojEpizoda' in item ? 'serija' : 'film')
+                )}
               </div>
             </div>
           )}
@@ -300,7 +272,7 @@ export default function Pocetna() {
               🏆 Top 3 najbolja filma
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {topFilmovi.map(film => renderCard(film, 'film', movieTrivias[film.id]))}
+              {topFilmovi.map(film => renderCard(film, 'film'))}
             </div>
           </section>
         )}
@@ -312,7 +284,7 @@ export default function Pocetna() {
               🏆 Top 3 najbolje serije
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {topSerije.map(serija => renderCard(serija, 'serija', seriesTrivias[serija.id]))}
+              {topSerije.map(serija => renderCard(serija, 'serija'))}
             </div>
           </section>
         )}

@@ -65,7 +65,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
             <span className="font-medium">Žanr:</span> {movie.zanr ?? "-"}
           </p>
           {trivia && trivia[0] && (
-            <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivia[0].pitanje}>
+            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1" title={trivia[0].pitanje}>
               <span className="font-medium">Trivia:</span> {trivia[0].pitanje}
             </p>
           )}

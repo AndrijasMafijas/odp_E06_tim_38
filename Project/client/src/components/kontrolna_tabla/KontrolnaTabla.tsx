@@ -147,7 +147,7 @@ const KontrolnaTabla: React.FC<KontrolnaTablaProps> = () => {
                       {user.uloga === 'admin' ? (
                         <button
                           onClick={() => handleRoleChange(user.id, user.uloga || 'korisnik', 'korisnik')}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs transition-colors duration-200"
+                          className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded-md text-xs transition-colors duration-200"
                         >
                           ⬇️ Napravi korisnikom
                         </button>

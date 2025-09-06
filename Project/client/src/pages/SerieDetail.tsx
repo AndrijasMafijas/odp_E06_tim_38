@@ -16,7 +16,7 @@ interface Series {
   naziv: string;
   opis: string;
   prosecnaOcena: number;
-  brojSezona: number;
+  brojEpizoda: number;
   zanr?: string;
   godinaIzdanja?: number;
   cover_image?: string;
@@ -28,7 +28,6 @@ export default function SerieDetail() {
   const episodeApiService: IEpisodeApiService = useMemo(() => new EpisodeApiService(), []);
   const [serija, setSerija] = useState<Series | null>(null);
   const [epizode, setEpizode] = useState<Episode[]>([]);
-  const [odabranaSezone, setOdabranaSezone] = useState(1);
   const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
   const [ucitavaEpizode, setUcitavaEpizode] = useState(false);
@@ -142,12 +141,6 @@ export default function SerieDetail() {
     setEpisodeToDelete(null);
   };
 
-  const handleSeasonChange = async (seasonNumber: number) => {
-    setOdabranaSezone(seasonNumber);
-    // Za sada učitavamo sve epizode jer nemamo podršku za sezone u bazi
-    await fetchEpizode();
-  };
-
   const handleAddEpisodeSuccess = async () => {
     // Osvežavanje epizoda kada se uspešno doda nova epizoda
     await fetchEpizode();
@@ -167,7 +160,7 @@ export default function SerieDetail() {
         <div className="text-center text-red-600 dark:text-red-400 mb-4">{greska}</div>
         <button
           onClick={() => navigate("/serije")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+          className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded"
         >
           Nazad na katalog serija
         </button>
@@ -233,8 +226,8 @@ export default function SerieDetail() {
                 <p className="text-gray-900 dark:text-white">{serija.zanr ?? "Nepoznat"}</p>
               </div>
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">Broj sezona:</span>
-                <p className="text-gray-900 dark:text-white">{serija.brojSezona}</p>
+                <span className="font-semibold text-gray-700 dark:text-gray-300">Broj epizoda:</span>
+                <p className="text-gray-900 dark:text-white">{serija.brojEpizoda}</p>
               </div>
               <div>
                 <span className="font-semibold text-gray-700 dark:text-gray-300">Godina izdanja:</span>
@@ -277,28 +270,12 @@ export default function SerieDetail() {
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Epizode
             </h2>
-            
-            {/* Selektor sezone */}
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Sezona:</span>
-              <select
-                value={odabranaSezone}
-                onChange={(e) => handleSeasonChange(parseInt(e.target.value))}
-                className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {Array.from({ length: serija.brojSezona }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    Sezona {i + 1}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
           
           {/* Loading indicator za epizode */}
           {ucitavaEpizode ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
               <span className="ml-3 text-gray-600 dark:text-gray-400">Učitavanje epizoda...</span>
             </div>
           ) : (

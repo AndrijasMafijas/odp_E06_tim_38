@@ -17,7 +17,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
     brojEpizoda: 1,
     godinaIzdanja: new Date().getFullYear(),
     status: 'ongoing',
-    cover_image: '',
+    coverImage: '',
     triviaPitanje: '',
     triviaOdgovor: ''
   });
@@ -36,12 +36,12 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
       reader.onload = () => {
         const result = reader.result as string;
         // Sačuvaj ceo data URL format umesto samo base64 dela
-        setFormData(prev => ({ ...prev, cover_image: result }));
+        setFormData(prev => ({ ...prev, coverImage: result }));
       };
       reader.readAsDataURL(file);
     } else {
       setSelectedFileName('');
-      setFormData(prev => ({ ...prev, cover_image: '' }));
+      setFormData(prev => ({ ...prev, coverImage: '' }));
     }
   };
 
@@ -63,12 +63,12 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
     try {
       // Pripremi podatke za slanje
       let cover_image_base64 = '';
-      if (formData.cover_image) {
+      if (formData.coverImage) {
         // Ako je data URL format, uzmi samo base64 deo
-        if (formData.cover_image.startsWith('data:')) {
-          cover_image_base64 = formData.cover_image.split(',')[1];
+        if (formData.coverImage.startsWith('data:')) {
+          cover_image_base64 = formData.coverImage.split(',')[1];
         } else {
-          cover_image_base64 = formData.cover_image;
+          cover_image_base64 = formData.coverImage;
         }
       }
 
@@ -178,7 +178,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
               type="file"
               accept="image/*"
               onChange={handleImageChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100"
             />
             {selectedFileName && (
               <p className="text-sm text-green-600 dark:text-green-400 mt-1">
@@ -192,12 +192,12 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
             )}
             
             {/* Prikaz izabrane slike */}
-            {formData.cover_image && (
+            {formData.coverImage && (
               <div className="mt-3">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pregled slike:</p>
                 <div className="w-32 h-20 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
                   <img
-                    src={formData.cover_image}
+                    src={formData.coverImage}
                     alt="Pregled serije"
                     className="w-full h-full object-cover"
                   />
@@ -240,7 +240,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
             >
               {loading ? 'Snimanje...' : 'Dodaj seriju'}
             </button>

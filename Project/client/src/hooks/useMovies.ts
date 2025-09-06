@@ -30,9 +30,11 @@ export function useMovies(movieService: IMovieApiService): UseMoviesResult {
 
   const refreshMovies = useCallback(async () => {
     try {
+      console.log('Osvežavam filmove nakon ažuriranja ocene...');
       setLoading(true);
       setError('');
       const fetchedMovies = await movieService.getAllMovies();
+      console.log('Filmovi osveženi, ukupno:', fetchedMovies.length);
       setMovies(fetchedMovies);
     } catch (err) {
       console.error('Greška pri učitavanju filmova:', err);

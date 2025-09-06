@@ -25,9 +25,9 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
 
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between">
-      {series.cover_image && (
+      {series.coverImage && (
         <img 
-          src={series.cover_image} 
+          src={series.coverImage} 
           alt={series.naziv} 
           className="mb-3 w-full h-48 object-cover rounded-md"
         />
@@ -42,9 +42,9 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
         <p className="text-xs text-gray-600 dark:text-gray-400">
           <span className="font-medium">Žanr:</span> {series.zanr ?? "-"}
         </p>
-        {series.brojSezona && (
+        {series.brojEpizoda && (
           <p className="text-xs text-gray-600 dark:text-gray-400">
-            <span className="font-medium">Sezone:</span> {series.brojSezona}
+            <span className="font-medium">Epizode:</span> {series.brojEpizoda}
           </p>
         )}
         {series.status && (
@@ -53,7 +53,7 @@ export const SeriesCard: React.FC<SeriesCardProps> = ({
           </p>
         )}
         {trivia && trivia[0] && (
-          <p className="text-xs text-blue-700 dark:text-blue-300 line-clamp-1" title={trivia[0].pitanje}>
+          <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1" title={trivia[0].pitanje}>
             <span className="font-medium">Trivia:</span> {trivia[0].pitanje}
           </p>
         )}
