@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { IAuthService } from '../../Domain/services/auth/IAuthService';
 import { validacijaPodatakaAuth } from '../validators/auth/RegisterValidator';
+import jwt from "jsonwebtoken";
 
 export class AuthController {
   private router: Router;
@@ -38,7 +39,23 @@ export class AuthController {
 
       // Proveravamo da li je prijava uspešna
       if (result.id !== 0) {
-        res.status(200).json({success: true, message: 'Uspešna prijava', data: result});
+        // Generiši JWT token
+        const token = jwt.sign(
+          { 
+            id: result.id, 
+            korisnickoIme: result.korisnickoIme, 
+            uloga: result.uloga 
+          },
+          process.env.JWT_SECRET as string,
+          { expiresIn: '24h' }
+        );
+
+        res.status(200).json({
+          success: true, 
+          message: 'Uspešna prijava', 
+          data: result,
+          token: token
+        });
         return;
       } else {
         res.status(401).json({success: false, message: 'Neispravno korisničko ime ili lozinka'});

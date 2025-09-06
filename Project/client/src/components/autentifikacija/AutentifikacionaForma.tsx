@@ -46,7 +46,7 @@ const AutentifikacionaForma: React.FC<AuthFormProps> = ({ authApi, onLoginSucces
 						if (res.success) {
 							setUspesno("Uspešna prijava!");
 							setGreska(undefined);
-							onLoginSuccess(res.data);
+							onLoginSuccess(res.data, res.token);
 						} else {
 							setGreska(res.message);
 						}
@@ -58,7 +58,7 @@ const AutentifikacionaForma: React.FC<AuthFormProps> = ({ authApi, onLoginSucces
 							// Automatski prijavi korisnika nakon registracije
 							const loginRes = await authApi.prijava(korisnickoIme, lozinka);
 							if (loginRes.success) {
-								onLoginSuccess(loginRes.data);
+								onLoginSuccess(loginRes.data, loginRes.token);
 							} else {
 								navigate("/login");
 							}

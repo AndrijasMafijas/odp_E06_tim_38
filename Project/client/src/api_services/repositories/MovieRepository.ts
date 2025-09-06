@@ -27,7 +27,7 @@ export class MovieRepository implements IMovieRepository {
         prosecnaOcena: film.prosecnaOcena,
         zanr: film.zanr,
         godinaIzdanja: film.godinaIzdanja,
-        coverImage: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+        cover_image: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend koristi cover_image
       }));
       return mapiraniFilmovi;
     } catch (error) {
@@ -52,7 +52,16 @@ export class MovieRepository implements IMovieRepository {
 
   async create(data: CreateMovieDto): Promise<{ success: boolean; message: string }> {
     try {
-      await axios.post(`${this.baseUrl}/movies/public`, data);
+      // Mapiranje frontend formata na backend format
+      const backendData = {
+        ...data,
+        coverImage: data.cover_image // Frontend koristi cover_image, backend očekuje coverImage
+      };
+      
+      // Ukloni cover_image iz backendData jer backend ne očekuje to polje
+      const { cover_image, ...cleanBackendData } = backendData;
+      
+      await axios.post(`${this.baseUrl}/movies/public`, cleanBackendData);
       return { success: true, message: 'Film je uspešno dodat' };
     } catch (error: unknown) {
       console.error('Greška pri dodavanju filma:', error);

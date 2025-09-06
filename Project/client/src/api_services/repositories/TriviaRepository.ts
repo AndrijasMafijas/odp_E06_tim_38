@@ -8,7 +8,8 @@ export class TriviaRepository implements ITriviaRepository {
   private readonly baseUrl: string;
 
   constructor(baseUrl: string = API_URL) {
-    this.baseUrl = baseUrl;
+    // Uklanjamo trailing slash da izbegnemo dupli slash u URL-u
+    this.baseUrl = baseUrl.replace(/\/$/, '');
   }
 
   async fetchByContent(contentId: number, contentType: 'movie' | 'series'): Promise<Trivia[]> {

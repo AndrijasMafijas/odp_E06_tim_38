@@ -28,4 +28,8 @@ export class EpisodeService implements IEpisodeService {
   async delete(id: number): Promise<boolean> {
     return await this.episodesRepository.delete(id);
   }
+
+  async getBySeriesId(seriesId: number): Promise<Episode[]> {
+    return await this.episodesRepository.getBySeriesId(seriesId);
+  }
 }

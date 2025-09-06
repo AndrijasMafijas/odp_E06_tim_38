@@ -7,8 +7,8 @@ export class EpisodesRepository implements IEpisodesRepository {
   async create(episode: Episode): Promise<Episode> {
     try {
       const query = `
-        INSERT INTO episodes (naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO episodes (naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena, cover_image)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
         episode.naziv,
@@ -16,10 +16,11 @@ export class EpisodesRepository implements IEpisodesRepository {
         episode.trajanje,
         episode.brojEpizode,
         episode.serijaId,
-        episode.prosecnaOcena
+        episode.prosecnaOcena,
+        episode.cover_image || null
       ]);
       if (result.insertId) {
-        return new Episode(result.insertId, episode.naziv, episode.opis, episode.trajanje, episode.brojEpizode, episode.serijaId, episode.prosecnaOcena);
+        return new Episode(result.insertId, episode.naziv, episode.opis, episode.trajanje, episode.brojEpizode, episode.serijaId, episode.prosecnaOcena, episode.cover_image);
       }
       return new Episode();
     } catch {
@@ -30,14 +31,14 @@ export class EpisodesRepository implements IEpisodesRepository {
   async getById(id: number): Promise<Episode> {
     try {
       const query = `
-        SELECT id, naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena
+        SELECT id, naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena, cover_image
         FROM episodes
         WHERE id = ?
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
       if (rows.length > 0) {
         const row = rows[0];
-        return new Episode(row.id, row.naziv, row.opis, row.trajanje, row.brojEpizode, row.serijaId, row.prosecnaOcena);
+        return new Episode(row.id, row.naziv, row.opis, row.trajanje, row.brojEpizode, row.serijaId, row.prosecnaOcena, row.cover_image);
       }
       return new Episode();
     } catch {
@@ -48,13 +49,13 @@ export class EpisodesRepository implements IEpisodesRepository {
   async getAll(): Promise<Episode[]> {
     try {
       const query = `
-        SELECT id, naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena
+        SELECT id, naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena, cover_image
         FROM episodes
         ORDER BY id ASC
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query);
       return rows.map(
-        (row) => new Episode(row.id, row.naziv, row.opis, row.trajanje, row.brojEpizode, row.serijaId, row.prosecnaOcena)
+        (row) => new Episode(row.id, row.naziv, row.opis, row.trajanje, row.brojEpizode, row.serijaId, row.prosecnaOcena, row.cover_image)
       );
     } catch {
       return [];
@@ -65,7 +66,7 @@ export class EpisodesRepository implements IEpisodesRepository {
     try {
       const query = `
         UPDATE episodes
-        SET naziv = ?, opis = ?, trajanje = ?, brojEpizode = ?, serijaId = ?, prosecnaOcena = ?
+        SET naziv = ?, opis = ?, trajanje = ?, brojEpizode = ?, serijaId = ?, prosecnaOcena = ?, cover_image = ?
         WHERE id = ?
       `;
       const [result] = await db.execute<ResultSetHeader>(query, [
@@ -75,6 +76,7 @@ export class EpisodesRepository implements IEpisodesRepository {
         episode.brojEpizode,
         episode.serijaId,
         episode.prosecnaOcena,
+        episode.cover_image || null,
         episode.id
       ]);
       if (result.affectedRows > 0) {
@@ -96,6 +98,23 @@ export class EpisodesRepository implements IEpisodesRepository {
       return result.affectedRows > 0;
     } catch {
       return false;
+    }
+  }
+
+  async getBySeriesId(seriesId: number): Promise<Episode[]> {
+    try {
+      const query = `
+        SELECT id, naziv, opis, trajanje, brojEpizode, serijaId, prosecnaOcena, cover_image
+        FROM episodes
+        WHERE serijaId = ?
+        ORDER BY brojEpizode ASC
+      `;
+      const [rows] = await db.execute<RowDataPacket[]>(query, [seriesId]);
+      return rows.map(
+        (row) => new Episode(row.id, row.naziv, row.opis, row.trajanje, row.brojEpizode, row.serijaId, row.prosecnaOcena, row.cover_image)
+      );
+    } catch {
+      return [];
     }
   }
 

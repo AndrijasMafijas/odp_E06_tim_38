@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Movie } from '../../types/Movie';
 import type { Trivia } from '../../types/Trivia';
 import type { UserLoginDto } from '../../models/auth/UserLoginDto';
@@ -19,17 +20,27 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   onRefreshMovies,
   onDeleteMovie
 }) => {
-  const handleDeleteClick = () => {
+  const navigate = useNavigate();
+  
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Sprečava navigaciju kada se klikne na delete dugme
     onDeleteMovie(movie);
   };
 
+  const handleMovieClick = () => {
+    navigate(`/filmovi/${movie.id}`);
+  };
+
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-all duration-200 flex flex-col h-full">
+    <div 
+      className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-all duration-200 flex flex-col h-full cursor-pointer"
+      onClick={handleMovieClick}
+    >
       {/* Slika filma */}
-      {movie.coverImage && (
+      {movie.cover_image && (
         <div className="relative w-full h-64 overflow-hidden">
           <img 
-            src={movie.coverImage} 
+            src={movie.cover_image} 
             alt={movie.naziv} 
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105" 
             onError={(e) => {
@@ -61,7 +72,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
         </div>
         
         {/* Ocena i dugme u posebnom boxu */}
-        <div className="mt-auto">
+        <div className="mt-auto" onClick={(e) => e.stopPropagation()}>
           <div className="rounded-md bg-gray-100 dark:bg-gray-700 p-2 flex flex-col items-center">
             <div className="flex items-center gap-1 mb-1">
               <span className="text-sm text-gray-700 dark:text-gray-300 mr-1">Prosečna ocena:</span>

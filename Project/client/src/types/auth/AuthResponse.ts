@@ -7,4 +7,5 @@ export interface AuthResponse {
   success: boolean;
   message: string;
   data?: UserLoginDto;
+  token?: string;
 }

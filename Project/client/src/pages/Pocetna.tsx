@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import type { Trivia } from "../types/Trivia";
+import { useTrivias } from "../hooks/useTrivias";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,7 +13,7 @@ interface Movie {
   opis: string;
   prosecnaOcena: number;
   zanr?: string;
-  coverImage?: string;
+  cover_image?: string;
 }
 
 interface Series {
@@ -21,7 +24,7 @@ interface Series {
   brojSezona: number;
   zanr?: string;
   godinaIzdanja?: number;
-  coverImage?: string;
+  cover_image?: string;
 }
 
 export default function Pocetna() {
@@ -32,6 +35,17 @@ export default function Pocetna() {
   const [ucitava, setUcitava] = useState(true);
   const [pretraga, setPretraga] = useState("");
   const [rezultatiPretrage, setRezultatiPretrage] = useState<(Movie | Series)[]>([]);
+
+  // Hook-ovi za trivia podatke
+  const movieIds = useMemo(() => topFilmovi.map(movie => movie.id), [topFilmovi]);
+  const seriesIds = useMemo(() => topSerije.map(series => series.id), [topSerije]);
+  const allMovieIds = useMemo(() => sviFilmovi.map(movie => movie.id), [sviFilmovi]);
+  const allSeriesIds = useMemo(() => sveSerije.map(series => series.id), [sveSerije]);
+  
+  const movieTrivias = useTrivias(movieIds, 'movie');
+  const seriesTrivias = useTrivias(seriesIds, 'series');
+  const allMovieTrivias = useTrivias(allMovieIds, 'movie');
+  const allSeriesTrivias = useTrivias(allSeriesIds, 'series');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,7 +70,7 @@ export default function Pocetna() {
           brojSezona: serija.brojSezona, // Ispravno mapiranje - broj sezona iz baze
           zanr: serija.zanr,
           godinaIzdanja: serija.godinaIzdanja,
-          coverImage: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+          cover_image: serija.coverUrl || serija.cover_image // Backend šalje coverUrl, frontend koristi cover_image
         }));
 
         // Mapiranje backend podataka na frontend format za filmove
@@ -66,7 +80,7 @@ export default function Pocetna() {
           opis: film.opis,
           prosecnaOcena: film.prosecnaOcena,
           zanr: film.zanr,
-          coverImage: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
+          cover_image: film.coverUrl || film.cover_image // Backend šalje coverUrl, frontend koristi cover_image
         }));
 
         // Sortiraj po prosečnoj oceni i uzmi top 3
@@ -110,13 +124,13 @@ export default function Pocetna() {
     setRezultatiPretrage(filtrirani);
   }, [pretraga, sviFilmovi, sveSerije]);
 
-  const renderCard = (item: Movie | Series, tip: 'film' | 'serija') => (
+  const renderCard = (item: Movie | Series, tip: 'film' | 'serija', trivia?: Trivia[]) => (
     <div key={`${tip}-${item.id}`} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
       {/* Poster area */}
       <div className="relative h-64 overflow-hidden">
-        {item.coverImage ? (
+        {item.cover_image ? (
           <img 
-            src={item.coverImage} 
+            src={item.cover_image} 
             alt={item.naziv} 
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             onError={(e) => {
@@ -164,15 +178,21 @@ export default function Pocetna() {
           )}
         </div>
         
-        {'brojSezona' in item && (
-          <p className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
-            {item.brojSezona} sezona{item.brojSezona !== 1 ? 'a' : ''}
-          </p>
-        )}
-        
         <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2 mb-3">
           {item.opis}
         </p>
+
+        {/* Trivia sekcija */}
+        {trivia && trivia.length > 0 && (
+          <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900 dark:bg-opacity-20 rounded-md border-l-4 border-yellow-400">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="text-yellow-600 dark:text-yellow-400 text-xs font-medium">💡 Trivia:</span>
+            </div>
+            <p className="text-xs text-gray-700 dark:text-gray-300">
+              {trivia[0].pitanje}
+            </p>
+          </div>
+        )}
         
         <div className="flex justify-between items-center">
           {tip === 'serija' && (
@@ -184,9 +204,12 @@ export default function Pocetna() {
             </Link>
           )}
           {tip === 'film' && (
-            <div className="px-3 py-1 bg-green-500 text-white rounded-md text-xs">
-              Film
-            </div>
+            <Link
+              to={`/filmovi/${item.id}`}
+              className="inline-block px-3 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-green-600 transition-colors"
+            >
+              Detalji
+            </Link>
           )}
         </div>
       </div>
@@ -238,9 +261,11 @@ export default function Pocetna() {
                 Rezultati pretrage
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {rezultatiPretrage.map(item => 
-                  renderCard(item, 'brojSezona' in item ? 'serija' : 'film')
-                )}
+                {rezultatiPretrage.map(item => {
+                  const tipSadrzaja = 'brojSezona' in item ? 'serija' : 'film';
+                  const trivia = tipSadrzaja === 'serija' ? allSeriesTrivias[item.id] : allMovieTrivias[item.id];
+                  return renderCard(item, tipSadrzaja, trivia);
+                })}
               </div>
             </div>
           )}
@@ -275,7 +300,7 @@ export default function Pocetna() {
               🏆 Top 3 najbolja filma
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {topFilmovi.map(film => renderCard(film, 'film'))}
+              {topFilmovi.map(film => renderCard(film, 'film', movieTrivias[film.id]))}
             </div>
           </section>
         )}
@@ -287,7 +312,7 @@ export default function Pocetna() {
               🏆 Top 3 najbolje serije
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {topSerije.map(serija => renderCard(serija, 'serija'))}
+              {topSerije.map(serija => renderCard(serija, 'serija', seriesTrivias[serija.id]))}
             </div>
           </section>
         )}

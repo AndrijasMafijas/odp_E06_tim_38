@@ -6,4 +6,5 @@ export interface IEpisodeService {
   getAll(): Promise<Episode[]>;
   update(episode: Episode): Promise<Episode>;
   delete(id: number): Promise<boolean>;
+  getBySeriesId(seriesId: number): Promise<Episode[]>;
 }

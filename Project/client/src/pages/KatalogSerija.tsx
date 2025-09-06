@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import type { Trivia } from "../types/Trivia";
@@ -19,7 +20,7 @@ interface Series {
   brojSezona: number;
   zanr?: string;
   godinaIzdanja?: number;
-  coverImage?: string;
+  cover_image?: string;
 }
 
 type SortKey = "naziv" | "prosecnaOcena";
@@ -45,17 +46,21 @@ export default function KatalogSerija() {
   async function fetchSerije() {
     try {
       const res = await axios.get(`${API_URL}series`);
+      
       // Mapiranje backend podataka na frontend format
-      const mapiraneSerije = res.data.map((serija: any) => ({
-        id: serija.id,
-        naziv: serija.naziv,
-        opis: serija.opis,
-        prosecnaOcena: serija.prosecnaOcena,
-        brojSezona: serija.brojEpizoda, // Backend ima brojEpizoda, frontend očekuje brojSezona
-        zanr: serija.zanr,
-        godinaIzdanja: serija.godinaIzdanja,
-        coverImage: serija.coverImage ? `data:image/webp;base64,${serija.coverImage}` : undefined // Pretvaramo u data URL
-      }));
+      const mapiraneSerije = res.data.map((serija: any) => {
+        return {
+          id: serija.id,
+          naziv: serija.naziv,
+          opis: serija.opis,
+          prosecnaOcena: serija.prosecnaOcena,
+          brojSezona: serija.brojEpizoda, // Backend ima brojEpizoda, frontend očekuje brojSezona
+          zanr: serija.zanr,
+          godinaIzdanja: serija.godinaIzdanja,
+          cover_image: serija.coverUrl || serija.cover_image // Backend šalje coverUrl, frontend koristi cover_image
+        };
+      });
+      
       setSerije(mapiraneSerije);
     } catch (err) {
       console.error("Greška pri učitavanju serija:", err);
@@ -196,14 +201,24 @@ export default function KatalogSerija() {
         )}
         
         {/* Series Cards */}
-        {sortiraneSerije().map((serija) => (
+        {sortiraneSerije().map((serija) => {
+          return (
           <div
             key={serija.id}
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between"
             onClick={() => handleSerijaClick(serija.id)}
           >
-            {serija.coverImage && (
-              <img src={serija.coverImage} alt={serija.naziv} className="mb-3 w-full h-48 object-cover rounded-md" />
+            {serija.cover_image && (
+              <img 
+                src={serija.cover_image} 
+                alt={serija.naziv} 
+                className="mb-3 w-full h-48 object-cover rounded-md"
+              />
+            )}
+            {!serija.cover_image && (
+              <div className="mb-3 w-full h-48 bg-gray-200 dark:bg-gray-600 rounded-md flex items-center justify-center">
+                <span className="text-gray-500 dark:text-gray-400">No Image</span>
+              </div>
             )}
             <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white line-clamp-1">{serija.naziv}</h3>
             <p className="text-sm mb-3 text-gray-700 dark:text-gray-300 line-clamp-2">{serija.opis}</p>
@@ -249,7 +264,8 @@ export default function KatalogSerija() {
               </div>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       {/* Add Series Modal */}

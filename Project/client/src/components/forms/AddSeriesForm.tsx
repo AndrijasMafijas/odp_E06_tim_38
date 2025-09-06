@@ -16,14 +16,33 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
     brojEpizoda: 1,
     godinaIzdanja: new Date().getFullYear(),
     status: 'ongoing',
-    coverImage: '',
+    cover_image: '',
     triviaPitanje: '',
     triviaOdgovor: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedFileName, setSelectedFileName] = useState('');
 
   const seriesService = ServiceFactory.getSeriesService();
+
+  // Funkcija za konvertovanje fajla u base64
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFileName(file.name);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Sačuvaj ceo data URL format umesto samo base64 dela
+        setFormData(prev => ({ ...prev, cover_image: result }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setSelectedFileName('');
+      setFormData(prev => ({ ...prev, cover_image: '' }));
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -41,7 +60,23 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
     setError('');
 
     try {
-      const result = await seriesService.createSeries(formData);
+      // Pripremi podatke za slanje
+      let cover_image_base64 = '';
+      if (formData.cover_image) {
+        // Ako je data URL format, uzmi samo base64 deo
+        if (formData.cover_image.startsWith('data:')) {
+          cover_image_base64 = formData.cover_image.split(',')[1];
+        } else {
+          cover_image_base64 = formData.cover_image;
+        }
+      }
+
+      const seriesData = {
+        ...formData,
+        cover_image: cover_image_base64
+      };
+
+      const result = await seriesService.createSeries(seriesData);
       if (result.success) {
         onSuccess();
       } else {
@@ -136,16 +171,38 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Cover slika (URL)
+              Slika naslovnice
             </label>
             <input
-              type="url"
-              name="coverImage"
-              value={formData.coverImage}
-              onChange={handleChange}
-              placeholder="https://example.com/slika.jpg"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
+            {selectedFileName && (
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                ✓ Izabrana slika: {selectedFileName}
+              </p>
+            )}
+            {!selectedFileName && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Opcional - odaberite sliku za seriju
+              </p>
+            )}
+            
+            {/* Prikaz izabrane slike */}
+            {formData.cover_image && (
+              <div className="mt-3">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pregled slike:</p>
+                <div className="w-32 h-20 border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                  <img
+                    src={formData.cover_image}
+                    alt="Pregled serije"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

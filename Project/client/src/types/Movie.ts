@@ -5,7 +5,7 @@ export interface Movie {
   prosecnaOcena: number;
   zanr?: string;
   godinaIzdanja?: number;
-  coverImage?: string;
+  cover_image?: string;
 }
 
 export interface CreateMovieDto {
@@ -14,7 +14,7 @@ export interface CreateMovieDto {
   zanr?: string;
   trajanje?: string;
   godinaIzdanja?: string;
-  coverImage?: string;
+  cover_image?: string;
   triviaPitanje?: string;
   triviaOdgovor?: string;
 }

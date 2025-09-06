@@ -46,8 +46,10 @@ export class SeriesController {
       console.log('Generated coverUrl for series', series.id, ':', coverUrl.substring(0, 100) + '...');
     }
     
+    // Uklanjamo coverImage i dodajemo coverUrl
+    const { coverImage, ...seriesWithoutCoverImage } = series;
     return {
-      ...series,
+      ...seriesWithoutCoverImage,
       coverUrl: coverUrl
     };
   }

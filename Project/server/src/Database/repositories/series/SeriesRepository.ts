@@ -38,7 +38,7 @@ export class SeriesRepository implements ISeriesRepository {
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
       if (rows.length > 0) {
         const row = rows[0];
-        return new Series(row.id, row.naziv, row.opis, row.brojEpizoda, row.zanr, row.godinaIzdanja, row.prosecnaOcena, row.cover_image);
+        return new Series(row.id, row.naziv, row.opis, row.brojEpizoda, row.zanr, row.godinaIzdanja, row.prosecnaOcena, row.cover_image || '');
       }
       return new Series();
     } catch {
@@ -55,7 +55,7 @@ export class SeriesRepository implements ISeriesRepository {
       `;
       const [rows] = await db.execute<RowDataPacket[]>(query);
       return rows.map(
-        (row) => new Series(row.id, row.naziv, row.opis, row.brojEpizoda, row.zanr, row.godinaIzdanja, row.prosecnaOcena, row.cover_image)
+        (row) => new Series(row.id, row.naziv, row.opis, row.brojEpizoda, row.zanr, row.godinaIzdanja, row.prosecnaOcena, row.cover_image || '')
       );
     } catch {
       return [];

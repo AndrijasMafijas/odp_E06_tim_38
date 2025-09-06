@@ -6,6 +6,7 @@ import { authApi } from "./api_services/auth/AuthAPIService";
 import KatalogFilmova from "./pages/KatalogFilmova";
 import KatalogSerija from "./pages/KatalogSerija";
 import SerieDetail from "./pages/SerieDetail";
+import MovieDetail from "./pages/MovieDetail";
 import Pocetna from "./pages/Pocetna";
 import MojProfil from "./pages/MojProfil";
 import Navigacija from "./components/navigation/Navigacija";
@@ -22,10 +23,14 @@ export default function AppContent() {
     setPrijavljen(!!localStorage.getItem("korisnik"));
   }, []);
 
-  const handleLoginSuccess = (user?: UserLoginDto) => {
+  const handleLoginSuccess = (user?: UserLoginDto, token?: string) => {
     setPrijavljen(true);
     if (user) {
       localStorage.setItem("korisnik", JSON.stringify(user));
+    }
+    if (token) {
+      localStorage.setItem("authToken", token);
+      console.log("Token sačuvan u localStorage:", token);
     }
     // Preusmeri na početnu stranu nakon prijave
     navigate("/");
@@ -34,6 +39,7 @@ export default function AppContent() {
   const handleLogout = () => {
     setPrijavljen(false);
     localStorage.removeItem("korisnik");
+    localStorage.removeItem("authToken");
     // Preusmeri na login stranu nakon odjave
     navigate("/login");
   };
@@ -53,6 +59,7 @@ export default function AppContent() {
         <Route path="/katalog" element={<KatalogFilmova />} />
         <Route path="/serije" element={<KatalogSerija />} />
         <Route path="/serije/:id" element={<SerieDetail />} />
+        <Route path="/filmovi/:id" element={<MovieDetail />} />
         <Route path="/profil" element={prijavljen ? <MojProfil onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/login" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={handleLoginSuccess} />} />
         <Route path="/signup" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={handleLoginSuccess} />} />
