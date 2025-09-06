@@ -16,9 +16,8 @@ export class EpisodeController {
   }
 
   private initializeRoutes(): void {
-    // Public routes - accessible without auth
     this.router.get("/series/:seriesId/episodes", this.getEpisodesBySeriesId.bind(this));
-    this.router.post("/episodes/public", this.createEpisodePublic.bind(this)); // Public create route
+    this.router.post("/episodes/public", this.createEpisodePublic.bind(this));
     
     // Admin-only routes
     this.router.get("/episodes", authMiddleware, adminMiddleware, this.getAllEpisodes.bind(this));

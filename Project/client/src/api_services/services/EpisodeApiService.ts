@@ -1,12 +1,17 @@
 import axios from 'axios';
 import type { Episode } from '../../types/Episode';
+import type { IEpisodeApiService } from '../interfaces/IEpisodeApiService';
 
-const API_URL = import.meta.env.VITE_API_URL;
+export class EpisodeApiService implements IEpisodeApiService {
+  private readonly baseUrl: string;
 
-export class EpisodeAPIService {
+  constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
+    this.baseUrl = baseUrl;
+  }
+
   async getEpisodesBySeriesId(seriesId: number): Promise<Episode[]> {
     try {
-      const response = await axios.get(`${API_URL}series/${seriesId}/episodes`);
+      const response = await axios.get(`${this.baseUrl}/series/${seriesId}/episodes`);
       return response.data;
     } catch (error) {
       console.error('Greška pri dohvatanju epizoda:', error);
@@ -17,7 +22,7 @@ export class EpisodeAPIService {
   async delete(episodeId: number): Promise<void> {
     try {
       console.log('Pozivam DELETE za epizodu:', episodeId);
-      console.log('API URL:', `${API_URL}episodes/${episodeId}`);
+      console.log('API URL:', `${this.baseUrl}/episodes/${episodeId}`);
       
       // Dodaj token iz localStorage
       const authToken = localStorage.getItem('authToken');
@@ -30,7 +35,7 @@ export class EpisodeAPIService {
         console.log('Nema authToken u localStorage');
       }
       
-      const response = await axios.delete(`${API_URL}episodes/${episodeId}`, { headers });
+      const response = await axios.delete(`${this.baseUrl}/episodes/${episodeId}`, { headers });
       console.log('Delete response:', response);
     } catch (error) {
       console.error('Greška pri brisanju epizode:', error);
@@ -41,6 +46,14 @@ export class EpisodeAPIService {
       throw error;
     }
   }
-}
 
-export const episodeAPIService = new EpisodeAPIService();
+  async getEpisodeById(episodeId: number): Promise<Episode | null> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/episodes/${episodeId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Greška pri dohvatanju epizode:', error);
+      return null;
+    }
+  }
+}

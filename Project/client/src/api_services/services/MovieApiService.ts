@@ -1,15 +1,15 @@
 import axios from 'axios';
 import type { Movie, CreateMovieDto } from '../../types/Movie';
-import type { IMovieRepository } from '../interfaces/IMovieService';
+import type { IMovieApiService } from '../interfaces/IMovieApiService';
 
-export class MovieRepository implements IMovieRepository {
+export class MovieApiService implements IMovieApiService {
   private readonly baseUrl: string;
 
   constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
     this.baseUrl = baseUrl;
   }
 
-  async fetchAll(): Promise<Movie[]> {
+  async getAllMovies(): Promise<Movie[]> {
     try {
       // Dodaj cache busting parametar
       const timestamp = new Date().getTime();
@@ -20,7 +20,7 @@ export class MovieRepository implements IMovieRepository {
         }
       });
       // Mapiranje backend podataka na frontend format
-      const mapiraniFilmovi = response.data.map((film: any) => ({
+      const mapiraniFilmovi = response.data.map((film: { id: number; naziv: string; opis: string; prosecnaOcena: number; zanr: string; godinaIzdanja: number; coverUrl?: string; coverImage?: string }) => ({
         id: film.id,
         naziv: film.naziv,
         opis: film.opis,
@@ -36,9 +36,13 @@ export class MovieRepository implements IMovieRepository {
     }
   }
 
-  async delete(id: number): Promise<{ success: boolean; message: string }> {
+  async deleteMovie(movieId: number): Promise<{ success: boolean; message: string }> {
+    if (movieId <= 0) {
+      return { success: false, message: 'Nevalidan ID filma' };
+    }
+    
     try {
-      const response = await axios.delete(`${this.baseUrl}/movies/public/${id}`);
+      const response = await axios.delete(`${this.baseUrl}/movies/public/${movieId}`);
       return response.data;
     } catch (error: unknown) {
       console.error('Greška pri brisanju filma:', error);
@@ -50,15 +54,24 @@ export class MovieRepository implements IMovieRepository {
     }
   }
 
-  async create(data: CreateMovieDto): Promise<{ success: boolean; message: string }> {
+  async createMovie(movieData: CreateMovieDto): Promise<{ success: boolean; message: string }> {
+    // Validacija podataka
+    if (!movieData.naziv?.trim()) {
+      return { success: false, message: 'Naziv filma je obavezan' };
+    }
+    if (!movieData.opis?.trim()) {
+      return { success: false, message: 'Opis filma je obavezan' };
+    }
+    
     try {
       // Mapiranje frontend formata na backend format
       const backendData = {
-        ...data,
-        coverImage: data.cover_image // Frontend koristi cover_image, backend očekuje coverImage
+        ...movieData,
+        coverImage: movieData.cover_image // Frontend koristi cover_image, backend očekuje coverImage
       };
       
       // Ukloni cover_image iz backendData jer backend ne očekuje to polje
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { cover_image, ...cleanBackendData } = backendData;
       
       await axios.post(`${this.baseUrl}/movies/public`, cleanBackendData);

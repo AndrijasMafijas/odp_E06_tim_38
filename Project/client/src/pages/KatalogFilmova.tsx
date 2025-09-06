@@ -3,7 +3,8 @@ import type { Movie } from "../types/Movie";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 import { useMovies } from "../hooks/useMovies";
 import { useTrivias } from "../hooks/useTrivias";
-import { ServiceFactory } from "../api_services/factories/ServiceFactory";
+import type { IMovieApiService } from "../api_services/interfaces/IMovieApiService";
+import { MovieApiService } from "../api_services/services/MovieApiService";
 import { MovieFilters } from "../components/movie/MovieFilters";
 import { MovieCard } from "../components/movie/MovieCard";
 import { AddMovieCard } from "../components/movie/AddMovieCard";
@@ -11,7 +12,7 @@ import AddMovieForm from "../components/forms/AddMovieForm";
 import DeleteConfirmModal from "../components/modals/DeleteConfirmModal";
 
 export default function KatalogFilmova() {
-  const movieService = ServiceFactory.getMovieService();
+  const movieService: IMovieApiService = useMemo(() => new MovieApiService(), []);
   
   const {
     movies,

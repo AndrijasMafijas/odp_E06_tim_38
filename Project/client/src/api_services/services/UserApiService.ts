@@ -1,15 +1,15 @@
 import axios from 'axios';
 import type { User, CreateUserDto, UpdateUserRoleDto } from '../../types/User';
-import type { IUserRepository } from '../interfaces/IUserService';
+import type { IUserApiService } from '../interfaces/IUserApiService';
 
-export class UserRepository implements IUserRepository {
+export class UserApiService implements IUserApiService {
   private readonly baseUrl: string;
 
   constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
     this.baseUrl = baseUrl;
   }
 
-  async fetchAll(): Promise<User[]> {
+  async getAllUsers(): Promise<User[]> {
     try {
       const response = await axios.get(`${this.baseUrl}/users`);
       return response.data;
@@ -19,7 +19,14 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async updateRole(userId: number, roleData: UpdateUserRoleDto): Promise<{ success: boolean; message: string }> {
+  async updateUserRole(userId: number, roleData: UpdateUserRoleDto): Promise<{ success: boolean; message: string }> {
+    if (userId <= 0) {
+      return { success: false, message: 'Nevalidan ID korisnika' };
+    }
+    if (!['korisnik', 'admin'].includes(roleData.uloga)) {
+      return { success: false, message: 'Nevalidna uloga' };
+    }
+    
     try {
       const response = await axios.put(`${this.baseUrl}/users/public/${userId}/role`, roleData);
       return response.data;
@@ -33,9 +40,20 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async create(data: CreateUserDto): Promise<{ success: boolean; message: string }> {
+  async createUser(userData: CreateUserDto): Promise<{ success: boolean; message: string }> {
+    // Validacija podataka
+    if (!userData.korisnickoIme?.trim()) {
+      return { success: false, message: 'Korisničko ime je obavezno' };
+    }
+    if (!userData.email?.trim()) {
+      return { success: false, message: 'Email je obavezan' };
+    }
+    if (!userData.lozinka?.trim()) {
+      return { success: false, message: 'Lozinka je obavezna' };
+    }
+    
     try {
-      await axios.post(`${this.baseUrl}/users`, data);
+      await axios.post(`${this.baseUrl}/users`, userData);
       return { success: true, message: 'Korisnik je uspešno kreiran' };
     } catch (error: unknown) {
       console.error('Greška pri kreiranju korisnika:', error);

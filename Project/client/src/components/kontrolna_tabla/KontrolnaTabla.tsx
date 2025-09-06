@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ServiceFactory } from '../../api_services/factories/ServiceFactory';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import type { IUserApiService } from '../../api_services/interfaces/IUserApiService';
+import { UserApiService } from '../../api_services/services/UserApiService';
 import type { UserLoginDto } from '../../models/auth/UserLoginDto';
 
 interface KontrolnaTablaProps {
@@ -11,8 +12,8 @@ const KontrolnaTabla: React.FC<KontrolnaTablaProps> = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Dobijanje servisa iz ServiceFactory
-  const userService = ServiceFactory.getUserService();
+  // Direktno instanciranje servisa sa useMemo i interface tipom
+  const userService: IUserApiService = useMemo(() => new UserApiService(), []);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Movie, MovieSortConfig, MovieFilterConfig } from '../types/Movie';
-import type { IMovieService } from '../api_services/interfaces/IMovieService';
+import type { IMovieApiService } from '../api_services/interfaces/IMovieApiService';
 import { MovieFilter, MovieSorter } from '../utils/MovieUtils';
 
 export interface UseMoviesResult {
@@ -16,7 +16,7 @@ export interface UseMoviesResult {
   deleteMovie: (movieId: number) => Promise<{ success: boolean; message: string }>;
 }
 
-export function useMovies(movieService: IMovieService): UseMoviesResult {
+export function useMovies(movieService: IMovieApiService): UseMoviesResult {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

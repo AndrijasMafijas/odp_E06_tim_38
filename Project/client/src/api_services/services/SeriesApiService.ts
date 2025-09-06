@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 import type { Series, CreateSeriesDto } from '../../types/Series';
-import type { ISeriesRepository } from '../interfaces/ISeriesService';
+import type { ISeriesApiService } from '../interfaces/ISeriesApiService';
 
-export class SeriesRepository implements ISeriesRepository {
+export class SeriesApiService implements ISeriesApiService {
   private readonly baseUrl: string;
 
   constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
     this.baseUrl = baseUrl;
   }
 
-  async fetchAll(): Promise<Series[]> {
+  async getAllSeries(): Promise<Series[]> {
     try {
       // Dodaj cache busting parametar
       const timestamp = new Date().getTime();
@@ -22,16 +20,11 @@ export class SeriesRepository implements ISeriesRepository {
         }
       });
       
-      console.log('Raw backend response:', response.data);
-      
       // Mapiranje backend podataka na frontend format
-      const mapiraneSerije = response.data.map((serija: any) => ({
+      const mapiraneSerije = response.data.map((serija: { id: number; naziv: string; opis: string; prosecnaOcena: number; zanr: string; godinaIzdanja: number; coverUrl?: string; coverImage?: string; brojEpizoda?: number }) => ({
         ...serija,
         cover_image: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend koristi cover_image
       }));
-      
-      console.log('Mapped series data (first item):', mapiraneSerije[0]);
-      console.log('Cover image length:', mapiraneSerije[0]?.cover_image?.length);
       
       return mapiraneSerije;
     } catch (error) {
@@ -40,9 +33,13 @@ export class SeriesRepository implements ISeriesRepository {
     }
   }
 
-  async delete(id: number): Promise<{ success: boolean; message: string }> {
+  async deleteSeries(seriesId: number): Promise<{ success: boolean; message: string }> {
+    if (seriesId <= 0) {
+      return { success: false, message: 'Nevalidan ID serije' };
+    }
+    
     try {
-      const response = await axios.delete(`${this.baseUrl}/series/public/${id}`);
+      const response = await axios.delete(`${this.baseUrl}/series/public/${seriesId}`);
       return response.data;
     } catch (error: unknown) {
       console.error('Greška pri brisanju serije:', error);
@@ -54,19 +51,28 @@ export class SeriesRepository implements ISeriesRepository {
     }
   }
 
-  async create(data: CreateSeriesDto): Promise<{ success: boolean; message: string }> {
+  async createSeries(seriesData: CreateSeriesDto): Promise<{ success: boolean; message: string }> {
+    // Validacija podataka
+    if (!seriesData.naziv?.trim()) {
+      return { success: false, message: 'Naziv serije je obavezan' };
+    }
+    if (!seriesData.opis?.trim()) {
+      return { success: false, message: 'Opis serije je obavezan' };
+    }
+    
     try {
       // Mapiranje frontend formata na backend format
       const backendData = {
-        ...data,
-        coverImage: data.cover_image // Frontend koristi cover_image, backend očekuje coverImage
+        ...seriesData,
+        coverImage: seriesData.cover_image // Frontend koristi cover_image, backend očekuje coverImage
       };
       
       // Ukloni cover_image iz backendData jer backend ne očekuje to polje
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { cover_image, ...cleanBackendData } = backendData;
       
       await axios.post(`${this.baseUrl}/series/public`, cleanBackendData);
-      return { success: true, message: 'Serija je uspešno dodata' };
+      return { success: true, message: 'Serija je uspešno dodana' };
     } catch (error: unknown) {
       console.error('Greška pri dodavanju serije:', error);
       const axiosError = error as { response?: { data?: { message?: string } } };

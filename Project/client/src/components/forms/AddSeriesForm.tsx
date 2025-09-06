@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { CreateSeriesDto } from '../../types/Series';
-import { ServiceFactory } from '../../api_services/factories/ServiceFactory';
+import type { ISeriesApiService } from '../../api_services/interfaces/ISeriesApiService';
+import { SeriesApiService } from '../../api_services/services/SeriesApiService';
 
 interface AddSeriesFormProps {
   onSuccess: () => void;
@@ -24,7 +25,7 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
   const [error, setError] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
 
-  const seriesService = ServiceFactory.getSeriesService();
+  const seriesService: ISeriesApiService = useMemo(() => new SeriesApiService(), []);
 
   // Funkcija za konvertovanje fajla u base64
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

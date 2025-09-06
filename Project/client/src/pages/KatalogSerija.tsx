@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import type { Trivia } from "../types/Trivia";
-import { ServiceFactory } from "../api_services/factories/ServiceFactory";
+import type { ITriviaApiService } from "../api_services/interfaces/ITriviaApiService";
+import type { ISeriesApiService } from "../api_services/interfaces/ISeriesApiService";
+import { TriviaApiService } from "../api_services/services/TriviaApiService";
+import { SeriesApiService } from "../api_services/services/SeriesApiService";
 import axios from "axios";
 import GradeInput from "../components/forms/GradeInput";
 import AddSeriesForm from "../components/forms/AddSeriesForm";
@@ -39,9 +42,9 @@ export default function KatalogSerija() {
   const [seriesToDelete, setSeriesToDelete] = useState<Series | null>(null);
   const navigate = useNavigate();
 
-  // Dobijanje servisa iz ServiceFactory
-  const triviaService = ServiceFactory.getTriviaService();
-  const seriesService = ServiceFactory.getSeriesService();
+  // Direktno instanciranje servisa sa useMemo i interface tipovima
+  const triviaService: ITriviaApiService = useMemo(() => new TriviaApiService(), []);
+  const seriesService: ISeriesApiService = useMemo(() => new SeriesApiService(), []);
 
   async function fetchSerije() {
     try {

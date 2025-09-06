@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { episodeAPIService } from "../api_services/episodes/EpisodeAPIService";
+import type { IEpisodeApiService } from "../api_services/interfaces/IEpisodeApiService";
+import { EpisodeApiService } from "../api_services/services/EpisodeApiService";
 import GradeInput from "../components/forms/GradeInput";
 import AddEpisodeForm from "../components/forms/AddEpisodeForm";
 import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
@@ -24,6 +25,7 @@ interface Series {
 export default function SerieDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const episodeApiService: IEpisodeApiService = useMemo(() => new EpisodeApiService(), []);
   const [serija, setSerija] = useState<Series | null>(null);
   const [epizode, setEpizode] = useState<Episode[]>([]);
   const [odabranaSezone, setOdabranaSezone] = useState(1);
@@ -55,7 +57,7 @@ export default function SerieDetail() {
     if (!id) return;
     setUcitavaEpizode(true);
     try {
-      const episodes = await episodeAPIService.getEpisodesBySeriesId(parseInt(id));
+      const episodes = await episodeApiService.getEpisodesBySeriesId(parseInt(id));
       setEpizode(episodes);
     } catch (err) {
       console.error("Greška pri učitavanju epizoda:", err);
@@ -87,7 +89,7 @@ export default function SerieDetail() {
         // Učitaj epizode
         setUcitavaEpizode(true);
         try {
-          const episodes = await episodeAPIService.getEpisodesBySeriesId(parseInt(id));
+          const episodes = await episodeApiService.getEpisodesBySeriesId(parseInt(id));
           setEpizode(episodes);
         } catch (err) {
           console.error("Greška pri učitavanju epizoda:", err);
@@ -104,7 +106,7 @@ export default function SerieDetail() {
     }
 
     loadSerija();
-  }, [id]);
+  }, [id, episodeApiService]);
 
   // Funkcija za brisanje epizode
   const handleDeleteEpisode = (epizoda: Episode) => {
@@ -117,7 +119,7 @@ export default function SerieDetail() {
     if (!episodeToDelete) return;
 
     try {
-      await episodeAPIService.delete(episodeToDelete.id);
+      await episodeApiService.delete(episodeToDelete.id);
       
       // Ukloni epizodu iz lokalnog stanja
       setEpizode(prevEpizode => prevEpizode.filter(e => e.id !== episodeToDelete.id));

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import type { CreateGradeDto } from "../../types/Grade";
-import { ServiceFactory } from "../../api_services/factories/ServiceFactory";
+import type { IGradeApiService } from "../../api_services/interfaces/IGradeApiService";
+import { GradeApiService } from "../../api_services/services/GradeApiService";
 
 interface GradeInputProps {
   userId: number;
@@ -15,7 +16,7 @@ const GradeInput: React.FC<GradeInputProps> = ({ userId, contentId, contentType,
   const [message, setMessage] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const gradeService = ServiceFactory.getGradeService();
+  const gradeService: IGradeApiService = useMemo(() => new GradeApiService(), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Trivia } from '../types/Trivia';
-import { ServiceFactory } from '../api_services/factories/ServiceFactory';
+import type { ITriviaApiService } from '../api_services/interfaces/ITriviaApiService';
+import { TriviaApiService } from '../api_services/services/TriviaApiService';
 
 export function useTrivias(contentIds: number[], contentType: 'movie' | 'series' = 'movie') {
   const [trivias, setTrivias] = useState<Record<number, Trivia[]>>({});
-  const triviaService = ServiceFactory.getTriviaService();
+  const triviaService: ITriviaApiService = useMemo(() => new TriviaApiService(), []);
 
   useEffect(() => {
     if (contentIds.length > 0) {

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { CreateMovieDto } from '../../types/Movie';
-import { ServiceFactory } from '../../api_services/factories/ServiceFactory';
+import type { IMovieApiService } from '../../api_services/interfaces/IMovieApiService';
+import { MovieApiService } from '../../api_services/services/MovieApiService';
 import { FormInput } from '../form/FormInput';
 import { FormTextarea } from '../form/FormTextarea';
 import { FormButtons } from '../form/FormButtons';
@@ -25,7 +26,7 @@ const AddMovieForm: React.FC<AddMovieFormProps> = ({ onSuccess, onCancel }) => {
   const [error, setError] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
 
-  const movieService = ServiceFactory.getMovieService();
+  const movieService: IMovieApiService = useMemo(() => new MovieApiService(), []);
 
   // Funkcija za konvertovanje fajla u base64
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
