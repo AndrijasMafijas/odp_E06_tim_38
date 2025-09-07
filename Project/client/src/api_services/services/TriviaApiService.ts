@@ -7,9 +7,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 export class TriviaApiService implements ITriviaApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = API_URL) {
+  constructor() {
     // Uklanjamo trailing slash da izbegnemo dupli slash u URL-u
-    this.baseUrl = baseUrl.replace(/\/$/, '');
+    this.baseUrl = API_URL.replace(/\/$/, '');
   }
 
   async getTriviasByContent(contentId: number, contentType: 'movie' | 'series'): Promise<Trivia[]> {

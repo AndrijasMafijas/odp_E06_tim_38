@@ -2,6 +2,7 @@ import type { Movie, CreateMovieDto } from '../../types/Movie';
 
 export interface IMovieApiService {
   getAllMovies(): Promise<Movie[]>;
+  getMovieById(id: number): Promise<Movie | null>;
   deleteMovie(movieId: number): Promise<{ success: boolean; message: string }>;
   createMovie(movieData: CreateMovieDto): Promise<{ success: boolean; message: string }>;
 }

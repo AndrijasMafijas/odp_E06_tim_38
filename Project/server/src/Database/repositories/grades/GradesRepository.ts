@@ -64,8 +64,6 @@ export class GradesRepository implements IGradesRepository {
 
   async update(grade: Grade): Promise<Grade> {
     try {
-      console.log(`Ažuriram ocenu: ID=${grade.id}, nova ocena=${grade.ocena}, sadržaj=${grade.sadrzajId}, tip=${grade.tipSadrzaja}`);
-      
       const query = `
         UPDATE grades
         SET korisnikId = ?, sadrzajId = ?, tipSadrzaja = ?, ocena = ?, komentar = ?
@@ -80,13 +78,11 @@ export class GradesRepository implements IGradesRepository {
         grade.id
       ]);
       if (result.affectedRows > 0) {
-        console.log(`Ocena uspešno ažurirana, ažuriram prosečnu ocenu za sadržaj ${grade.sadrzajId}`);
         await this.azurirajProsecnuOcenu(grade.sadrzajId, grade.tipSadrzaja);
         return grade;
       }
       return new Grade();
     } catch (error) {
-      console.error('Greška pri ažuriranju ocene:', error);
       return new Grade();
     }
   }
@@ -146,18 +142,11 @@ export class GradesRepository implements IGradesRepository {
     else if (tipSadrzaja === 'episode') tabela = 'episodes';
     else if (tipSadrzaja === 'series') tabela = 'series';
     else return;
-    
-    console.log(`Računam prosečnu ocenu za ${tipSadrzaja} ID=${sadrzajId}`);
-    
     const queryProsek = `SELECT AVG(ocena) as prosecna FROM grades WHERE sadrzajId = ? AND tipSadrzaja = ?`;
     const [rows] = await db.execute<RowDataPacket[]>(queryProsek, [sadrzajId, tipSadrzaja]);
     const prosecna = rows[0]?.prosecna || 0;
     
-    console.log(`Nova prosečna ocena: ${prosecna}, ažuriram tabelu ${tabela}`);
-    
     const queryUpdate = `UPDATE ${tabela} SET prosecnaOcena = ? WHERE id = ?`;
     await db.execute<ResultSetHeader>(queryUpdate, [prosecna, sadrzajId]);
-    
-    console.log(`Prosečna ocena ažurirana u bazi za ${tipSadrzaja} ID=${sadrzajId}`);
   }
 }

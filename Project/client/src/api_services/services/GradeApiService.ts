@@ -5,8 +5,9 @@ import type { IGradeApiService } from '../interfaces/IGradeApiService';
 export class GradeApiService implements IGradeApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
-    this.baseUrl = baseUrl;
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    this.baseUrl = apiUrl.replace(/\/$/, ''); // Uklanjamo trailing slash
   }
 
   async submitGrade(gradeData: CreateGradeDto): Promise<{ success: boolean; message: string; data?: Grade }> {

@@ -1,30 +1,16 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-interface Movie {
-  id: number;
-  naziv: string;
-  opis: string;
-  prosecnaOcena: number;
-  zanr?: string;
-  coverImage?: string;
-}
-
-interface Series {
-  id: number;
-  naziv: string;
-  opis: string;
-  prosecnaOcena: number;
-  brojEpizoda: number;
-  zanr?: string;
-  godinaIzdanja?: number;
-  coverImage?: string;
-}
+import type { Movie } from "../types/Movie";
+import type { Series } from "../types/Series";
+import type { IMovieApiService } from "../api_services/interfaces/IMovieApiService";
+import type { ISeriesApiService } from "../api_services/interfaces/ISeriesApiService";
+import { MovieApiService } from "../api_services/services/MovieApiService";
+import { SeriesApiService } from "../api_services/services/SeriesApiService";
 
 export default function Pocetna() {
+  const movieApiService: IMovieApiService = useMemo(() => new MovieApiService(), []);
+  const seriesApiService: ISeriesApiService = useMemo(() => new SeriesApiService(), []);
+  
   const [topFilmovi, setTopFilmovi] = useState<Movie[]>([]);
   const [topSerije, setTopSerije] = useState<Series[]>([]);
   const [sviFilmovi, setSviFilmovi] = useState<Movie[]>([]);
@@ -36,38 +22,17 @@ export default function Pocetna() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Učitaj filmove i serije sa cache busting
-        const timestamp = new Date().getTime();
-        const [filmResponse, serijeResponse] = await Promise.all([
-          axios.get(`${API_URL}movies?_t=${timestamp}`, {
-            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-          }),
-          axios.get(`${API_URL}series?_t=${timestamp}`, {
-            headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-          })
+        // Učitaj filmove i serije sa service layer
+        const [filmovi, serije] = await Promise.all([
+          movieApiService.getAllMovies(),
+          seriesApiService.getAllSeries()
         ]);
 
-        // Mapiranje backend podataka na frontend format za serije
-        const mapiraneSerije = serijeResponse.data.map((serija: any) => ({
-          id: serija.id,
-          naziv: serija.naziv,
-          opis: serija.opis,
-          prosecnaOcena: serija.prosecnaOcena,
-          brojEpizoda: serija.brojEpizoda, // Mapiranje broja epizoda iz baze
-          zanr: serija.zanr,
-          godinaIzdanja: serija.godinaIzdanja,
-          coverImage: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
-        }));
+        // Podaci su već pravilno formatirani iz servisa
+        const mapiraneSerije = serije;
 
-        // Mapiranje backend podataka na frontend format za filmove
-        const mapiraniFilmovi = filmResponse.data.map((film: any) => ({
-          id: film.id,
-          naziv: film.naziv,
-          opis: film.opis,
-          prosecnaOcena: film.prosecnaOcena,
-          zanr: film.zanr,
-          coverImage: film.coverUrl || film.coverImage // Backend šalje coverUrl, frontend očekuje coverImage
-        }));
+        // Podaci su već pravilno formatirani iz servisa
+        const mapiraniFilmovi = filmovi;
 
         // Sortiraj po prosečnoj oceni i uzmi top 3
         const sortedFilmovi = mapiraniFilmovi
@@ -90,7 +55,7 @@ export default function Pocetna() {
     };
 
     fetchData();
-  }, []);
+  }, [movieApiService, seriesApiService]);
 
   useEffect(() => {
     if (pretraga.trim() === "") {
@@ -110,13 +75,24 @@ export default function Pocetna() {
     setRezultatiPretrage(filtrirani);
   }, [pretraga, sviFilmovi, sveSerije]);
 
-  const renderCard = (item: Movie | Series, tip: 'film' | 'serija') => (
+  // Helper function to get image source
+  const getImageSource = (item: Movie | Series): string | undefined => {
+    if ('coverImage' in item) {
+      return item.coverImage;
+    }
+    if ('cover_image' in item) {
+      return item.cover_image;
+    }
+    return undefined;
+  };
+
+  const renderCard = (item: Movie | Series, tip: string) => (
     <div key={`${tip}-${item.id}`} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
       {/* Poster area */}
       <div className="relative h-64 overflow-hidden">
-        {item.coverImage ? (
+        {getImageSource(item) ? (
           <img 
-            src={item.coverImage} 
+            src={getImageSource(item)} 
             alt={item.naziv} 
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             onError={(e) => {

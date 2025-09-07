@@ -5,8 +5,9 @@ import type { ISeriesApiService } from '../interfaces/ISeriesApiService';
 export class SeriesApiService implements ISeriesApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
-    this.baseUrl = baseUrl;
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    this.baseUrl = apiUrl.replace(/\/$/, ''); // Uklanjamo trailing slash
   }
 
   async getAllSeries(): Promise<Series[]> {
@@ -23,13 +24,30 @@ export class SeriesApiService implements ISeriesApiService {
       // Mapiranje backend podataka na frontend format
       const mapiraneSerije = response.data.map((serija: { id: number; naziv: string; opis: string; prosecnaOcena: number; zanr: string; godinaIzdanja: number; coverUrl?: string; coverImage?: string; brojEpizoda?: number }) => ({
         ...serija,
-        cover_image: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend koristi cover_image
+        coverImage: serija.coverUrl || serija.coverImage // Backend šalje coverUrl, frontend koristi coverImage
       }));
       
       return mapiraneSerije;
     } catch (error) {
       console.error('Greška pri učitavanju serija:', error);
       throw new Error('Greška pri učitavanju serija');
+    }
+  }
+
+  async getSeriesById(id: number): Promise<Series | null> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/series/${id}`);
+      
+      // Mapiranje backend podataka na frontend format
+      const serija = {
+        ...response.data,
+        coverImage: response.data.coverUrl || response.data.coverImage
+      };
+      
+      return serija;
+    } catch (error) {
+      console.error('Greška pri učitavanju serije:', error);
+      return null;
     }
   }
 
@@ -64,14 +82,11 @@ export class SeriesApiService implements ISeriesApiService {
       // Mapiranje frontend formata na backend format
       const backendData = {
         ...seriesData,
-        coverImage: seriesData.cover_image // Frontend koristi cover_image, backend očekuje coverImage
+        coverImage: seriesData.coverImage // Frontend koristi coverImage, backend očekuje coverImage
       };
       
-      // Ukloni cover_image iz backendData jer backend ne očekuje to polje
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { cover_image, ...cleanBackendData } = backendData;
-      
-      await axios.post(`${this.baseUrl}/series/public`, cleanBackendData);
+      // Šaljemo podatke sa coverImage poljem
+      await axios.post(`${this.baseUrl}/series/public`, backendData);
       return { success: true, message: 'Serija je uspešno dodana' };
     } catch (error: unknown) {
       console.error('Greška pri dodavanju serije:', error);

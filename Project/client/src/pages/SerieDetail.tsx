@@ -1,34 +1,23 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import type { Series } from "../types/Series";
 import type { IEpisodeApiService } from "../api_services/interfaces/IEpisodeApiService";
+import type { ISeriesApiService } from "../api_services/interfaces/ISeriesApiService";
 import { EpisodeApiService } from "../api_services/services/EpisodeApiService";
+import { SeriesApiService } from "../api_services/services/SeriesApiService";
 import GradeInput from "../components/forms/GradeInput";
 import AddEpisodeForm from "../components/forms/AddEpisodeForm";
 import ConfirmDeleteModal from "../components/modals/ConfirmDeleteModal";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 import type { Episode } from "../types/Episode";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-interface Series {
-  id: number;
-  naziv: string;
-  opis: string;
-  prosecnaOcena: number;
-  brojEpizoda: number;
-  zanr?: string;
-  godinaIzdanja?: number;
-  cover_image?: string;
-}
-
 export default function SerieDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const episodeApiService: IEpisodeApiService = useMemo(() => new EpisodeApiService(), []);
+  const seriesApiService: ISeriesApiService = useMemo(() => new SeriesApiService(), []);
   const [serija, setSerija] = useState<Series | null>(null);
   const [epizode, setEpizode] = useState<Episode[]>([]);
-  const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
   const [ucitavaEpizode, setUcitavaEpizode] = useState(false);
   const [showAddEpisodeForm, setShowAddEpisodeForm] = useState(false);
@@ -37,26 +26,44 @@ export default function SerieDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [episodeToDelete, setEpisodeToDelete] = useState<Episode | null>(null);
 
-  const fetchSerija = async () => {
-    if (!id) return;
+  const fetchSerija = useCallback(async () => {
+    if (!id) {
+      navigate("/404", { replace: true });
+      return;
+    }
+
+    // Validacija da li je ID valjan broj
+    const seriesId = parseInt(id);
+    if (isNaN(seriesId) || seriesId <= 0) {
+      navigate("/404", { replace: true });
+      return;
+    }
+
     try {
-      const res = await axios.get(`${API_URL}series/${id}`);
-      // Mapiranje backend podataka na frontend format
-      const serijaData = {
-        ...res.data,
-        cover_image: res.data.coverUrl || res.data.cover_image // Backend šalje coverUrl, frontend koristi cover_image
-      };
-      setSerija(serijaData);
+      const serija = await seriesApiService.getSeriesById(seriesId);
+      if (!serija) {
+        navigate("/404", { replace: true });
+        return;
+      }
+      setSerija(serija);
     } catch (err) {
       console.error("Greška pri učitavanju serije:", err);
+      navigate("/404", { replace: true });
     }
-  };
+  }, [id, seriesApiService, navigate]);
 
-  const fetchEpizode = async () => {
+  const fetchEpizode = useCallback(async () => {
     if (!id) return;
+    
+    // Validacija da li je ID valjan broj
+    const seriesId = parseInt(id);
+    if (isNaN(seriesId) || seriesId <= 0) {
+      return;
+    }
+
     setUcitavaEpizode(true);
     try {
-      const episodes = await episodeApiService.getEpisodesBySeriesId(parseInt(id));
+      const episodes = await episodeApiService.getEpisodesBySeriesId(seriesId);
       setEpizode(episodes);
     } catch (err) {
       console.error("Greška pri učitavanju epizoda:", err);
@@ -64,48 +71,17 @@ export default function SerieDetail() {
     } finally {
       setUcitavaEpizode(false);
     }
-  };
+  }, [id, episodeApiService]);
 
   useEffect(() => {
-    async function loadSerija() {
-      if (!id) {
-        setGreska("Nevazeći ID serije");
-        setUcitava(false);
-        return;
-      }
-
-      try {
-        const res = await axios.get(`${API_URL}series/${id}`);
-        
-        // Mapiranje backend podataka na frontend format
-        const serijaData = {
-          ...res.data,
-          cover_image: res.data.coverUrl || res.data.cover_image // Backend šalje coverUrl, frontend koristi cover_image
-        };
-        
-        setSerija(serijaData);
-        
-        // Učitaj epizode
-        setUcitavaEpizode(true);
-        try {
-          const episodes = await episodeApiService.getEpisodesBySeriesId(parseInt(id));
-          setEpizode(episodes);
-        } catch (err) {
-          console.error("Greška pri učitavanju epizoda:", err);
-          setEpizode([]);
-        } finally {
-          setUcitavaEpizode(false);
-        }
-      } catch (err) {
-        console.error("Greška pri učitavanju serije:", err);
-        setGreska("Serija nije pronađena");
-      } finally {
-        setUcitava(false);
-      }
+    async function loadData() {
+      await fetchSerija();
+      await fetchEpizode();
+      setUcitava(false);
     }
-
-    loadSerija();
-  }, [id, episodeApiService]);
+    
+    loadData();
+  }, [fetchSerija, fetchEpizode]);
 
   // Funkcija za brisanje epizode
   const handleDeleteEpisode = (epizoda: Episode) => {
@@ -154,26 +130,8 @@ export default function SerieDetail() {
     );
   }
 
-  if (greska) {
-    return (
-      <div className="p-4">
-        <div className="text-center text-red-600 dark:text-red-400 mb-4">{greska}</div>
-        <button
-          onClick={() => navigate("/serije")}
-          className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded"
-        >
-          Nazad na katalog serija
-        </button>
-      </div>
-    );
-  }
-
   if (!serija) {
-    return (
-      <div className="p-4 text-center text-red-600 dark:text-red-400">
-        Serija nije pronađena
-      </div>
-    );
+    return null; // Komponenta će biti preusmerena na 404 iz fetchSerija funkcije
   }
 
   // Prijavljeni korisnik iz localStorage
@@ -199,17 +157,17 @@ export default function SerieDetail() {
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="md:flex">
-          {serija.cover_image && (
+          {serija.coverImage && (
             <div className="md:w-1/3">
               <img 
-                src={serija.cover_image} 
+                src={serija.coverImage} 
                 alt={serija.naziv} 
                 className="w-full h-96 md:h-full object-cover" 
               />
             </div>
           )}
           
-          {!serija.cover_image && (
+          {!serija.coverImage && (
             <div className="md:w-1/3 bg-gray-200 dark:bg-gray-600 flex items-center justify-center h-96">
               <span className="text-gray-500 dark:text-gray-400">No Series Image</span>
             </div>

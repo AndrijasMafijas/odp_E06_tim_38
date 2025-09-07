@@ -1,29 +1,35 @@
 import React from 'react';
-import type { SortKey, SortOrder, MovieSortConfig, MovieFilterConfig } from '../../types/Movie';
 
-interface MovieFiltersProps {
-  sortConfig: MovieSortConfig;
-  filterConfig: MovieFilterConfig;
-  onSortChange: (config: MovieSortConfig) => void;
-  onFilterChange: (config: MovieFilterConfig) => void;
+type SortKey = "naziv" | "prosecnaOcena";
+type SortOrder = "asc" | "desc";
+
+interface SeriesFiltersProps {
+  searchTerm: string;
+  sortKey: SortKey;
+  sortOrder: SortOrder;
+  onSearchChange: (searchTerm: string) => void;
+  onSortKeyChange: (sortKey: SortKey) => void;
+  onSortOrderChange: (sortOrder: SortOrder) => void;
 }
 
-export const MovieFilters: React.FC<MovieFiltersProps> = ({
-  sortConfig,
-  filterConfig,
-  onSortChange,
-  onFilterChange
+export const SeriesFilters: React.FC<SeriesFiltersProps> = ({
+  searchTerm,
+  sortKey,
+  sortOrder,
+  onSearchChange,
+  onSortKeyChange,
+  onSortOrderChange
 }) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFilterChange({ searchTerm: e.target.value });
+    onSearchChange(e.target.value);
   };
 
   const handleSortKeyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onSortChange({ ...sortConfig, key: e.target.value as SortKey });
+    onSortKeyChange(e.target.value as SortKey);
   };
 
   const handleSortOrderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onSortChange({ ...sortConfig, order: e.target.value as SortOrder });
+    onSortOrderChange(e.target.value as SortOrder);
   };
 
   return (
@@ -37,9 +43,9 @@ export const MovieFilters: React.FC<MovieFiltersProps> = ({
             </label>
             <input
               type="text"
-              placeholder="Unesite naziv filma..."
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors"
-              value={filterConfig.searchTerm}
+              placeholder="Unesite naziv serije..."
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              value={searchTerm}
               onChange={handleSearchChange}
             />
           </div>
@@ -51,9 +57,9 @@ export const MovieFilters: React.FC<MovieFiltersProps> = ({
                 📊 Sortiraj po
               </label>
               <select 
-                value={sortConfig.key} 
+                value={sortKey} 
                 onChange={handleSortKeyChange} 
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors min-w-[140px]"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors min-w-[140px]"
               >
                 <option value="naziv">Nazivu</option>
                 <option value="prosecnaOcena">Prosečnoj oceni</option>
@@ -65,9 +71,9 @@ export const MovieFilters: React.FC<MovieFiltersProps> = ({
                 🔄 Redosled
               </label>
               <select 
-                value={sortConfig.order} 
+                value={sortOrder} 
                 onChange={handleSortOrderChange} 
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-colors min-w-[120px]"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors min-w-[120px]"
               >
                 <option value="asc">Rastuće ↑</option>
                 <option value="desc">Opadajuće ↓</option>

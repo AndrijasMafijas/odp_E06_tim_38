@@ -62,19 +62,19 @@ const AddSeriesForm: React.FC<AddSeriesFormProps> = ({ onSuccess, onCancel }) =>
 
     try {
       // Pripremi podatke za slanje
-      let cover_image_base64 = '';
+      let coverImageBase64 = '';
       if (formData.coverImage) {
         // Ako je data URL format, uzmi samo base64 deo
         if (formData.coverImage.startsWith('data:')) {
-          cover_image_base64 = formData.coverImage.split(',')[1];
+          coverImageBase64 = formData.coverImage.split(',')[1];
         } else {
-          cover_image_base64 = formData.coverImage;
+          coverImageBase64 = formData.coverImage;
         }
       }
 
       const seriesData = {
         ...formData,
-        cover_image: cover_image_base64
+        coverImage: coverImageBase64
       };
 
       const result = await seriesService.createSeries(seriesData);

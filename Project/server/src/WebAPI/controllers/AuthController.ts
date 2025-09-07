@@ -2,23 +2,19 @@ import { Request, Response, Router } from 'express';
 import { IAuthService } from '../../Domain/services/auth/IAuthService';
 import { validacijaPodatakaAuth } from '../validators/auth/RegisterValidator';
 import jwt from "jsonwebtoken";
-
 export class AuthController {
   private router: Router;
   private authService: IAuthService;
-
   constructor(authService: IAuthService) {
     this.router = Router();
     this.authService = authService;
     this.initializeRoutes();
   }
-
   private initializeRoutes(): void {
     this.router.post('/auth/login', this.prijava.bind(this));
     this.router.post('/auth/register', this.registracija.bind(this));
     this.router.post('/auth/register/admin', this.registracijaAdmin.bind(this));
   }
-
   /**
    * POST /api/v1/auth/login
    * Prijava korisnika
@@ -26,17 +22,13 @@ export class AuthController {
   private async prijava(req: Request, res: Response): Promise<void> {
     try {
       const { korisnickoIme, lozinka } = req.body;
-
       // Validacija input parametara
       const rezultat = validacijaPodatakaAuth(korisnickoIme, lozinka);
-
       if (!rezultat.uspesno) {
         res.status(400).json({ success: false, message: rezultat.poruka });
         return;
       }
-
       const result = await this.authService.prijava(korisnickoIme, lozinka);
-
       // Proveravamo da li je prijava uspešna
       if (result.id !== 0) {
         // Generiši JWT token
@@ -49,7 +41,6 @@ export class AuthController {
           process.env.JWT_SECRET as string,
           { expiresIn: '24h' }
         );
-
         res.status(200).json({
           success: true, 
           message: 'Uspešna prijava', 
@@ -62,11 +53,9 @@ export class AuthController {
         return;
       }
     } catch (error) {
-      console.log(error);
       res.status(500).json({success: false, message: error});
     }
   }
-
   /**
    * POST /api/v1/auth/register
    * Registracija novog korisnika
@@ -74,18 +63,13 @@ export class AuthController {
   private async registracija(req: Request, res: Response): Promise<void> {
     try {
       const { korisnickoIme, lozinka, email } = req.body;
-
-      //console.log("AuthController registracija:", korisnickoIme, lozinka, email);
-
+      //
       const rezultat = validacijaPodatakaAuth(korisnickoIme, lozinka, email);
-
       if (!rezultat.uspesno) {
         res.status(400).json({ success: false, message: rezultat.poruka });
         return;
       }
-
       const result = await this.authService.registracija(korisnickoIme, lozinka, email);
-
       // Proveravamo da li je registracija uspešna
       if (result.id !== 0) {
         res.status(201).json({success: true, message: 'Uspešna registracija', data: result});
@@ -96,7 +80,6 @@ export class AuthController {
       res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});
     }
   }
-
   /**
    * POST /api/v1/auth/register/admin
    * Registracija novog admin korisnika
@@ -104,16 +87,12 @@ export class AuthController {
   private async registracijaAdmin(req: Request, res: Response): Promise<void> {
     try {
       const { korisnickoIme, lozinka, email } = req.body;
-
       const rezultat = validacijaPodatakaAuth(korisnickoIme, lozinka, email);
-
       if (!rezultat.uspesno) {
         res.status(400).json({ success: false, message: rezultat.poruka });
         return;
       }
-
       const result = await this.authService.registracijaAdmin(korisnickoIme, lozinka, email);
-
       // Proveravamo da li je registracija uspešna
       if (result.id !== 0) {
         res.status(201).json({success: true, message: 'Uspešna registracija admin korisnika', data: result});
@@ -124,7 +103,6 @@ export class AuthController {
       res.status(500).json({success: false, message: error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Greška na serveru.')});
     }
   }
-
   /**
    * Getter za router
    */

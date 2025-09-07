@@ -1,30 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import type { Trivia } from "../types/Trivia";
+import type { Series } from "../types/Series";
 import type { ITriviaApiService } from "../api_services/interfaces/ITriviaApiService";
 import type { ISeriesApiService } from "../api_services/interfaces/ISeriesApiService";
 import { TriviaApiService } from "../api_services/services/TriviaApiService";
 import { SeriesApiService } from "../api_services/services/SeriesApiService";
-import axios from "axios";
 import GradeInput from "../components/forms/GradeInput";
 import AddSeriesForm from "../components/forms/AddSeriesForm";
 import DeleteConfirmModal from "../components/modals/DeleteConfirmModal";
+import { SeriesFilters } from "../components/series/SeriesFilters";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
 import { useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-interface Series {
-  id: number;
-  naziv: string;
-  opis: string;
-  prosecnaOcena: number;
-  brojEpizoda: number;
-  zanr?: string;
-  godinaIzdanja?: number;
-  cover_image?: string;
-}
 
 type SortKey = "naziv" | "prosecnaOcena";
 type SortOrder = "asc" | "desc";
@@ -46,36 +32,21 @@ export default function KatalogSerija() {
   const triviaService: ITriviaApiService = useMemo(() => new TriviaApiService(), []);
   const seriesService: ISeriesApiService = useMemo(() => new SeriesApiService(), []);
 
-  async function fetchSerije() {
+  const fetchSerije = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}series`);
-      
-      // Mapiranje backend podataka na frontend format
-      const mapiraneSerije = res.data.map((serija: any) => {
-        return {
-          id: serija.id,
-          naziv: serija.naziv,
-          opis: serija.opis,
-          prosecnaOcena: serija.prosecnaOcena,
-          brojEpizoda: serija.brojEpizoda, // Backend šalje brojEpizoda
-          zanr: serija.zanr,
-          godinaIzdanja: serija.godinaIzdanja,
-          cover_image: serija.coverUrl || serija.cover_image // Backend šalje coverUrl, frontend koristi cover_image
-        };
-      });
-      
-      setSerije(mapiraneSerije);
+      const serije = await seriesService.getAllSeries();
+      setSerije(serije);
     } catch (err) {
       console.error("Greška pri učitavanju serija:", err);
       setGreska("Greška pri učitavanju serija");
     } finally {
       setUcitava(false);
     }
-  }
+  }, [seriesService]);
 
   useEffect(() => {
     fetchSerije();
-  }, []);
+  }, [fetchSerije]);
 
   useEffect(() => {
     // Kada se serije učitaju, povuci trivije za svaku seriju
@@ -101,7 +72,8 @@ export default function KatalogSerija() {
       if (result.success) {
         setSerije(prev => prev.filter(s => s.id !== series.id));
         setTrivije(prev => {
-          const { [series.id]: deleted, ...rest } = prev;
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { [series.id]: _, ...rest } = prev;
           return rest;
         });
         alert(result.message);
@@ -153,36 +125,16 @@ export default function KatalogSerija() {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Katalog serija</h2>
-      </div>
+      <h2 className="text-3xl md:text-4xl font-bold mb-6 text-cyan-600 dark:text-cyan-400 text-center">Katalog serija</h2>
       
-      <div className="flex flex-wrap gap-4 mb-4 items-end">
-        <input
-          type="text"
-          placeholder="Pretraga po nazivu..."
-          className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={pretraga}
-          onChange={e => setPretraga(e.target.value)}
-        />
-        <label className="text-gray-700 dark:text-gray-200">Sortiraj po:</label>
-        <select 
-          value={sortKey} 
-          onChange={e => setSortKey(e.target.value as SortKey)} 
-          className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="naziv">Nazivu</option>
-          <option value="prosecnaOcena">Prosečnoj oceni</option>
-        </select>
-        <select 
-          value={sortOrder} 
-          onChange={e => setSortOrder(e.target.value as SortOrder)} 
-          className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="asc">Rastuće</option>
-          <option value="desc">Opadajuće</option>
-        </select>
-      </div>
+      <SeriesFilters
+        searchTerm={pretraga}
+        sortKey={sortKey}
+        sortOrder={sortOrder}
+        onSearchChange={setPretraga}
+        onSortKeyChange={setSortKey}
+        onSortOrderChange={setSortOrder}
+      />
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {/* Add Series Card - samo za admin korisnike */}
@@ -211,14 +163,14 @@ export default function KatalogSerija() {
             className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow cursor-pointer hover:shadow-lg transition-shadow duration-200 flex flex-col justify-between"
             onClick={() => handleSerijaClick(serija.id)}
           >
-            {serija.cover_image && (
+            {serija.coverImage && (
               <img 
-                src={serija.cover_image} 
+                src={serija.coverImage} 
                 alt={serija.naziv} 
                 className="mb-3 w-full h-48 object-cover rounded-md"
               />
             )}
-            {!serija.cover_image && (
+            {!serija.coverImage && (
               <div className="mb-3 w-full h-48 bg-gray-200 dark:bg-gray-600 rounded-md flex items-center justify-center">
                 <span className="text-gray-500 dark:text-gray-400">No Image</span>
               </div>

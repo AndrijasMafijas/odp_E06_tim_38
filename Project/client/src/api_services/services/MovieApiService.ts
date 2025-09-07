@@ -5,8 +5,9 @@ import type { IMovieApiService } from '../interfaces/IMovieApiService';
 export class MovieApiService implements IMovieApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
-    this.baseUrl = baseUrl;
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    this.baseUrl = apiUrl.replace(/\/$/, ''); // Uklanjamo trailing slash
   }
 
   async getAllMovies(): Promise<Movie[]> {
@@ -33,6 +34,23 @@ export class MovieApiService implements IMovieApiService {
     } catch (error) {
       console.error('Greška pri učitavanju filmova:', error);
       throw new Error('Greška pri učitavanju filmova');
+    }
+  }
+
+  async getMovieById(id: number): Promise<Movie | null> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/movies/${id}`);
+      
+      // Mapiranje backend podataka na frontend format
+      const film = {
+        ...response.data,
+        cover_image: response.data.coverUrl || response.data.coverImage
+      };
+      
+      return film;
+    } catch (error) {
+      console.error('Greška pri učitavanju filma:', error);
+      return null;
     }
   }
 

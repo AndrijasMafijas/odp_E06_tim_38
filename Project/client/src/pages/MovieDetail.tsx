@@ -1,27 +1,16 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import type { Movie } from "../types/Movie";
+import type { IMovieApiService } from "../api_services/interfaces/IMovieApiService";
+import { MovieApiService } from "../api_services/services/MovieApiService";
 import GradeInput from "../components/forms/GradeInput";
 import type { UserLoginDto } from "../models/auth/UserLoginDto";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
-interface Movie {
-  id: number;
-  naziv: string;
-  opis: string;
-  prosecnaOcena: number;
-  trajanje?: number;
-  zanr?: string;
-  godinaIzdanja?: number;
-  cover_image?: string;
-}
 
 export default function MovieDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const movieApiService: IMovieApiService = useMemo(() => new MovieApiService(), []);
   const [film, setFilm] = useState<Movie | null>(null);
-  const [greska, setGreska] = useState("");
   const [ucitava, setUcitava] = useState(true);
 
   // Proveravanje da li je korisnik ulogovan
@@ -30,26 +19,33 @@ export default function MovieDetail() {
 
   const fetchFilm = useCallback(async () => {
     if (!id) {
-      setGreska("Nevažeći ID filma");
-      setUcitava(false);
+      navigate("/404", { replace: true });
+      return;
+    }
+
+    // Validacija da li je ID valjan broj
+    const movieId = parseInt(id);
+    if (isNaN(movieId) || movieId <= 0) {
+      navigate("/404", { replace: true });
       return;
     }
 
     try {
-      const res = await axios.get(`${API_URL}movies/${id}`);
-      // Mapiranje backend podataka na frontend format
-      const filmData = {
-        ...res.data,
-        cover_image: res.data.coverUrl || res.data.cover_image // Backend šalje coverUrl, frontend koristi cover_image
-      };
-      setFilm(filmData);
+      const film = await movieApiService.getMovieById(movieId);
+      
+      if (!film) {
+        navigate("/404", { replace: true });
+        return;
+      }
+      
+      setFilm(film);
     } catch (err) {
       console.error("Greška pri učitavanju filma:", err);
-      setGreska("Film nije pronađen");
+      navigate("/404", { replace: true });
     } finally {
       setUcitava(false);
     }
-  }, [id]);
+  }, [id, movieApiService, navigate]);
 
   useEffect(() => {
     fetchFilm();
@@ -63,21 +59,8 @@ export default function MovieDetail() {
     );
   }
 
-  if (greska || !film) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center items-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Greška</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">{greska}</p>
-          <button
-            onClick={() => navigate("/")}
-            className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
-          >
-            Povratak na početnu
-          </button>
-        </div>
-      </div>
-    );
+  if (!film) {
+    return null; // Komponenta će biti preusmerena na 404 iz useEffect-a
   }
 
   return (
@@ -130,14 +113,6 @@ export default function MovieDetail() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     {film.godinaIzdanja}
-                  </span>
-                )}
-                {film.trajanje && (
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {film.trajanje} min
                   </span>
                 )}
                 {film.zanr && (

@@ -5,8 +5,9 @@ import type { IUserApiService } from '../interfaces/IUserApiService';
 export class UserApiService implements IUserApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
-    this.baseUrl = baseUrl;
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    this.baseUrl = apiUrl.replace(/\/$/, ''); // Uklanjamo trailing slash
   }
 
   async getAllUsers(): Promise<User[]> {

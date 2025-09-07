@@ -158,7 +158,6 @@ export class UserRepository implements IUserRepository {
       const [result] = await db.execute<ResultSetHeader>(query, [uloga, id]);
       return result.affectedRows > 0;
     } catch (error) {
-      console.error("Greška pri ažuriranju uloge:", error);
       return false;
     }
   }

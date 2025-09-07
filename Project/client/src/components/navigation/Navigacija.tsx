@@ -42,7 +42,7 @@ export default function Navigacija({ prijavljen, onLogout }: NavigacijaProps) {
 
   const navLinks = [
     { to: "/", label: "Početna" },
-    { to: "/katalog", label: "Katalog filmova" },
+    { to: "/filmovi", label: "Katalog filmova" },
     { to: "/serije", label: "Katalog serija" },
   ];
 

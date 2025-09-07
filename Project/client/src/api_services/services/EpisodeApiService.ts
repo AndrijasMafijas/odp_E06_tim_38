@@ -5,8 +5,9 @@ import type { IEpisodeApiService } from '../interfaces/IEpisodeApiService';
 export class EpisodeApiService implements IEpisodeApiService {
   private readonly baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000/api/v1') {
-    this.baseUrl = baseUrl;
+  constructor() {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    this.baseUrl = apiUrl.replace(/\/$/, ''); // Uklanjamo trailing slash
   }
 
   async getEpisodesBySeriesId(seriesId: number): Promise<Episode[]> {

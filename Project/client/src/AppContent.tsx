@@ -9,6 +9,7 @@ import SerieDetail from "./pages/SerieDetail";
 import MovieDetail from "./pages/MovieDetail";
 import Pocetna from "./pages/Pocetna";
 import MojProfil from "./pages/MojProfil";
+import NotFound from "./pages/NotFound";
 import Navigacija from "./components/navigation/Navigacija";
 import ThemeToggle from "./components/ui/ThemeToggle";
 import type { UserLoginDto } from "./models/auth/UserLoginDto";
@@ -56,7 +57,7 @@ export default function AppContent() {
       </div>
       <Routes>
         <Route path="/" element={<Pocetna />} />
-        <Route path="/katalog" element={<KatalogFilmova />} />
+        <Route path="/filmovi" element={<KatalogFilmova />} />
         <Route path="/serije" element={<KatalogSerija />} />
         <Route path="/serije/:id" element={<SerieDetail />} />
         <Route path="/filmovi/:id" element={<MovieDetail />} />
@@ -64,6 +65,10 @@ export default function AppContent() {
         <Route path="/login" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={handleLoginSuccess} />} />
         <Route path="/signup" element={<AutentifikacionaForma authApi={authApi} onLoginSuccess={handleLoginSuccess} />} />
         <Route path="/dashboard" element={prijavljen ? <KontrolnaTabla /> : <Navigate to="/login" />} />
+        {/* Eksplicitna 404 ruta */}
+        <Route path="/404" element={<NotFound />} />
+        {/* Catch-all route za 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

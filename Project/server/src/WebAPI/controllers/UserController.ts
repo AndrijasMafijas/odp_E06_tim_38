@@ -61,12 +61,9 @@ export class UserController {
    */
   private async getAllUsersPublic(req: Request, res: Response): Promise<void> {
     try {
-      console.log("GET /users - Pokušavam da učitam sve korisnike...");
       const users = await this.userService.getAll();
-      console.log(`Pronađeno korisnika: ${users.length}`);
       res.status(200).json(users);
     } catch (error) {
-      console.error("Greška pri učitavanju korisnika:", error);
       res.status(500).json({ success: false, message: "Greška pri učitavanju korisnika" });
     }
   }
@@ -80,8 +77,6 @@ export class UserController {
       const id = Number(req.params.id);
       const { uloga } = req.body;
       
-      console.log(`PUT /users/public/${id}/role - Ažuriram ulogu na: ${uloga}`);
-      
       if (!uloga || !['korisnik', 'admin'].includes(uloga)) {
         res.status(400).json({ success: false, message: "Neispravna uloga. Mora biti 'korisnik' ili 'admin'." });
         return;
@@ -90,17 +85,14 @@ export class UserController {
       const success = await this.userService.updateRole(id, uloga);
       
       if (success) {
-        console.log(`Uloga korisnika ${id} je ažurirana na: ${uloga}`);
         res.status(200).json({ 
           success: true, 
           message: `Korisnik je uspešno ${uloga === 'admin' ? 'unapređen u administratora' : 'vraćen na korisnika'}.` 
         });
       } else {
-        console.log(`Neuspešno ažuriranje uloge za korisnika ${id}`);
         res.status(404).json({ success: false, message: "Korisnik nije pronađen." });
       }
     } catch (error) {
-      console.error("Greška pri ažuriranju uloge:", error);
       res.status(500).json({ success: false, message: "Greška pri ažuriranju uloge korisnika." });
     }
   }
